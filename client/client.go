@@ -76,13 +76,11 @@ func (client *PrinceClient) eventHandler(evt interface{}) {
 }
 
 func (client *PrinceClient) handleCommand(e *events.Message) {
-	msg := e.Message
-
 	if !e.Info.IsFromMe {
 		return
 	}
 
-	content := msg.GetConversation()
+	content, ctx := commands.GetTextContext(e)
 
 	if !strings.HasPrefix(content, client.commandPrefix) {
 		return
@@ -98,7 +96,7 @@ func (client *PrinceClient) handleCommand(e *events.Message) {
 	log.Println("Runnning commmand", cmdName, "with args", cmdArgs)
 	for _, cmd := range commands.CommandList {
 		if cmdName == cmd.Name {
-			cmd.Execute(client.wac, e, cmdArgs)
+			cmd.Execute(client.wac, e, ctx, cmdArgs)
 		}
 	}
 }
