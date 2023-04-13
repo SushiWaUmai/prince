@@ -21,7 +21,7 @@ func init() {
 	createCommand("chatgpt", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) {
 		var prompt string
 
-		if ctx.QuotedMessage != nil {
+		if ctx != nil && ctx.QuotedMessage != nil {
 			prompt = *ctx.QuotedMessage.Conversation + "\n\n"
 		}
 
