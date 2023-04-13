@@ -21,11 +21,17 @@ func init() {
 	createCommand("chatgpt", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) {
 		var prompt string
 
+		if ctx.QuotedMessage != nil {
+			prompt = *ctx.QuotedMessage.Conversation + "\n\n"
+		}
+
 		if len(args) > 0 {
-			prompt = strings.Join(args, " ")
-		} else if ctx.QuotedMessage != nil {
-			prompt = *ctx.QuotedMessage.Conversation
-		} else {
+			prompt += strings.Join(args, " ")
+		}
+
+		prompt = strings.TrimSpace(prompt)
+
+		if len(prompt) <= 0 {
 			log.Println("Failed to generate openai response, no prompt was provided")
 			return
 		}
