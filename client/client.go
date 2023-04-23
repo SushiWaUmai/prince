@@ -4,10 +4,9 @@ import (
 	"context"
 	"log"
 	"os"
-	"strings"
 
-	"github.com/SushiWaUmai/prince/commands"
 	"github.com/mdp/qrterminal"
+	"github.com/robfig/cron/v3"
 	"go.mau.fi/whatsmeow"
 	"go.mau.fi/whatsmeow/store"
 	"go.mau.fi/whatsmeow/types/events"
@@ -18,6 +17,7 @@ import (
 
 type PrinceClient struct {
 	wac            *whatsmeow.Client
+	cronJob        *cron.Cron
 	eventHandlerId uint32
 	commandPrefix  string
 }
@@ -29,6 +29,7 @@ func CreatePrinceClient(prefix string, deviceStore *store.Device) *PrinceClient 
 		wac:            wac,
 		eventHandlerId: 0,
 		commandPrefix:  prefix,
+		cronJob:        cron.New(),
 	}
 
 	client.register()
@@ -58,9 +59,16 @@ func (client *PrinceClient) Connect() {
 			log.Fatalln(err)
 		}
 	}
+
+	err := client.startCronJobs()
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func (client *PrinceClient) Disconnect() {
+	log.Println("Stopping Cron Job...")
+	client.cronJob.Stop()
 	client.wac.Disconnect()
 }
 
@@ -71,32 +79,19 @@ func (client *PrinceClient) register() {
 func (client *PrinceClient) eventHandler(evt interface{}) {
 	switch v := evt.(type) {
 	case *events.Message:
-		client.handleCommand(v)
+		client.handleMessage(v)
 	}
 }
 
-func (client *PrinceClient) handleCommand(e *events.Message) {
-	if !e.Info.IsFromMe {
-		return
+func (client *PrinceClient) startCronJobs() error {
+	_, err := client.cronJob.AddFunc("0 0 * * *", client.sendRepeatedMessages)
+
+	if err != nil {
+		return err
 	}
 
-	content, ctx := commands.GetTextContext(e)
+	log.Println("Starting Cron Job...")
+	client.cronJob.Start()
 
-	if !strings.HasPrefix(content, client.commandPrefix) {
-		return
-	}
-
-	content = content[len(client.commandPrefix):]
-
-	// split the command name with the arguments
-	split := strings.SplitN(content, " ", -1)
-	cmdName := split[0]
-	cmdArgs := split[1:]
-
-	log.Println("Runnning commmand", cmdName, "with args", cmdArgs)
-	for _, cmd := range commands.CommandList {
-		if cmdName == cmd.Name {
-			cmd.Execute(client.wac, e, ctx, cmdArgs)
-		}
-	}
+	return nil
 }
