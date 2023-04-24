@@ -35,7 +35,6 @@ func UpdateNextDate(id uint, nextDate time.Time) {
 func GetRepeatedMessageToday() []RepeatedMessage {
 	var messages []RepeatedMessage
 	now := time.Now()
-	today := now.Format("2006-01-02") // format today's date as YYYY-MM-DD
-	db.Where("next_date <= ? AND repeat LIKE %?%", now, today).Find(&messages)
+	db.Where("next_date <= ?", now).Find(&messages)
 	return messages
 }
