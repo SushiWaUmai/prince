@@ -23,7 +23,7 @@ type PrinceClient struct {
 }
 
 func CreatePrinceClient(prefix string, deviceStore *store.Device) *PrinceClient {
-	clientLog := waLog.Stdout("Client", "ERROR", true)
+	clientLog := waLog.Stdout("Client", "INFO", true)
 	wac := whatsmeow.NewClient(deviceStore, clientLog)
 	client := &PrinceClient{
 		wac:            wac,
