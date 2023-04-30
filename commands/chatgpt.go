@@ -13,11 +13,9 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-var chatgpt *openai.Client
+var OpenAIClient = openai.NewClient(env.OPENAI_API_KEY)
 
 func init() {
-	chatgpt = openai.NewClient(env.OPENAI_API_KEY)
-
 	createCommand("chatgpt", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) {
 		var prompt string
 
@@ -36,7 +34,7 @@ func init() {
 			return
 		}
 
-		resp, err := chatgpt.CreateChatCompletion(
+		resp, err := OpenAIClient.CreateChatCompletion(
 			context.Background(),
 			openai.ChatCompletionRequest{
 				Model: openai.GPT3Dot5Turbo,

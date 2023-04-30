@@ -12,7 +12,7 @@ RUN go build
 
 FROM alpine as runner
 RUN apk update
-RUN apk add sqlite
+RUN apk add sqlite ffmpeg --no-cache
 WORKDIR /
 
 COPY --from=builder /prince .
