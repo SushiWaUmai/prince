@@ -3,6 +3,7 @@ package commands
 import (
 	"context"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -51,8 +52,12 @@ func init() {
 		db.CreateRepeatedMessage(messageEvent.Info.Chat.String(), message, repeat, date)
 
 		// Reply
-		client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
+		_, err = client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
 			Conversation: proto.String(fmt.Sprintf("Saved! Sending first message at %s", date.Format("02.01.2006"))),
 		})
+
+		if err != nil {
+			log.Println(err)
+		}
 	})
 }

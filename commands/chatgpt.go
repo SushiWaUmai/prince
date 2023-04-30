@@ -75,8 +75,12 @@ func init() {
 
 		reply := resp.Choices[0].Message.Content
 
-		client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
+		_, err = client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
 			Conversation: &reply,
 		})
+
+		if err != nil {
+			log.Println(err)
+		}
 	})
 }

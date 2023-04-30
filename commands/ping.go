@@ -2,6 +2,7 @@ package commands
 
 import (
 	"context"
+	"log"
 
 	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
@@ -15,8 +16,12 @@ func init() {
 			reply = args[0]
 		}
 
-		client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
+		_, err := client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
 			Conversation: &reply,
 		})
+
+		if err != nil {
+			log.Println(err)
+		}
 	})
 }

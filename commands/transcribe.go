@@ -45,9 +45,13 @@ func init() {
 		}
 
 		// Send the transcription back to the user
-		client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
+		_, err = client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
 			Conversation: &transcription,
 		})
+
+		if err != nil {
+			log.Println(err)
+		}
 	})
 }
 

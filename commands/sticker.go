@@ -47,6 +47,7 @@ func init() {
 		webpByte, err := webp.EncodeRGBA(img, *proto.Float32(1))
 		if err != nil {
 			log.Fatal(err)
+			return
 		}
 
 		uploadResp, err := client.Upload(context.Background(), webpByte, whatsmeow.MediaImage)

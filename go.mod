@@ -7,9 +7,9 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/mdp/qrterminal v1.0.1
-	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/sashabaranov/go-openai v1.7.0
+	github.com/srwiley/oksvg v0.0.0-20221011165216-be6e8873101c
 	github.com/u2takey/ffmpeg-go v0.4.1
 	go.mau.fi/whatsmeow v0.0.0-20230410091758-46e30e265256
 	google.golang.org/protobuf v1.28.1
@@ -24,8 +24,14 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
+	github.com/srwiley/rasterx v0.0.0-20210519020934-456a8d69b780 // indirect
+	github.com/stretchr/testify v1.8.2 // indirect
 	github.com/u2takey/go-utils v0.3.1 // indirect
 	go.mau.fi/libsignal v0.1.0 // indirect
 	golang.org/x/crypto v0.6.0 // indirect
+	golang.org/x/image v0.0.0-20211028202545-6944b10bf410 // indirect
+	golang.org/x/net v0.8.0 // indirect
+	golang.org/x/text v0.8.0 // indirect
+	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	rsc.io/qr v0.2.0 // indirect
 )
