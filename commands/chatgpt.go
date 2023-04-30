@@ -10,6 +10,7 @@ import (
 	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
 	"go.mau.fi/whatsmeow/types/events"
+	"google.golang.org/protobuf/proto"
 )
 
 var OpenAIClient = openai.NewClient(env.OPENAI_API_KEY)
@@ -19,7 +20,28 @@ func init() {
 		var prompt string
 
 		if ctx != nil && ctx.QuotedMessage != nil {
-			prompt = *ctx.QuotedMessage.Conversation + "\n\n"
+			if ctx.QuotedMessage.Conversation != nil {
+				prompt = *ctx.QuotedMessage.Conversation + "\n\n"
+			} else if ctx.QuotedMessage.AudioMessage != nil {
+				// Download the voice message
+				audioData, err := client.Download(ctx.QuotedMessage.AudioMessage)
+				if err != nil {
+					client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
+						Conversation: proto.String("Failed to download the voice message"),
+					})
+					return
+				}
+
+				text, err := TranscribeAudio(audioData)
+				if err != nil {
+					client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
+						Conversation: proto.String("Failed to download the voice message"),
+					})
+					return
+				}
+
+				prompt = text + "\n\n"
+			}
 		}
 
 		if len(args) > 0 {

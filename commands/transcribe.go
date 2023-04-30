@@ -34,16 +34,6 @@ func init() {
 			return
 		}
 
-		// if ogg convert to mp3
-		audioData, err = oggToMp3(audioData)
-		if err != nil {
-			client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
-				Conversation: proto.String("Failed to convert the voice message"),
-			})
-			log.Println(err)
-			return
-		}
-
 		// Use a Golang library to transcribe the audio to text
 		transcription, err := TranscribeAudio(audioData)
 		if err != nil {
@@ -62,6 +52,11 @@ func init() {
 }
 
 func TranscribeAudio(audioData []byte) (string, error) {
+	audioData, err := oggToMp3(audioData)
+	if err != nil {
+		return "", err
+	}
+
 	tmpFile, err := os.CreateTemp("", "audio*.mp3")
 	if err != nil {
 		return "", err
