@@ -31,10 +31,12 @@ func (client *PrinceClient) handleMessage(e *events.Message) {
 	cmdName := split[0]
 	cmdArgs := split[1:]
 
-	log.Println("Runnning commmand", cmdName, "with args", cmdArgs)
 	for _, cmd := range commands.CommandList {
 		if cmdName == cmd.Name {
+			log.Println("Runnning commmand", cmdName, "with args", cmdArgs)
 			cmd.Execute(client.wac, e, ctx, cmdArgs)
+			log.Println("Done.")
+			break
 		}
 	}
 }

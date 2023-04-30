@@ -56,7 +56,7 @@ func init() {
 
 		// Send the transcription back to the user
 		client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
-			Conversation: proto.String(transcription),
+			Conversation: &transcription,
 		})
 	})
 }

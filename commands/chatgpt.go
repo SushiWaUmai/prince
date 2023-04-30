@@ -10,7 +10,6 @@ import (
 	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
 	"go.mau.fi/whatsmeow/types/events"
-	"google.golang.org/protobuf/proto"
 )
 
 var OpenAIClient = openai.NewClient(env.OPENAI_API_KEY)
@@ -55,7 +54,7 @@ func init() {
 		reply := resp.Choices[0].Message.Content
 
 		client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
-			Conversation: proto.String(reply),
+			Conversation: &reply,
 		})
 	})
 }

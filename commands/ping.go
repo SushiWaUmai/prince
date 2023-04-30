@@ -6,7 +6,6 @@ import (
 	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
 	"go.mau.fi/whatsmeow/types/events"
-	"google.golang.org/protobuf/proto"
 )
 
 func init() {
@@ -17,7 +16,7 @@ func init() {
 		}
 
 		client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
-			Conversation: proto.String(reply),
+			Conversation: &reply,
 		})
 	})
 }

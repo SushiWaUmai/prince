@@ -3,9 +3,11 @@ module github.com/SushiWaUmai/prince
 go 1.20
 
 require (
+	github.com/chai2010/webp v1.1.1
 	github.com/joho/godotenv v1.5.1
 	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/mdp/qrterminal v1.0.1
+	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/sashabaranov/go-openai v1.7.0
 	github.com/u2takey/ffmpeg-go v0.4.1
