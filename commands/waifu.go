@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strings"
 
@@ -14,55 +15,38 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+type animeImage struct {
+	Url string `json:"url"`
+}
+
 type animeResponse struct {
-	URL string `json:"url"`
+	Images []animeImage `json:"images"`
 }
 
 var animeCategories = []string{
+	"maid",
 	"waifu",
-	"neko",
-	"shinobu",
-	"megumin",
-	"bully",
-	"cuddle",
-	"cry",
-	"hug",
-	"awoo",
-	"kiss",
-	"lick",
-	"pat",
-	"smug",
-	"bonk",
-	"yeet",
-	"blush",
-	"smile",
-	"wave",
-	"highfive",
-	"handhold",
-	"nom",
-	"bite",
-	"glomp",
-	"slap",
-	"kill",
-	"kick",
-	"happy",
-	"wink",
-	"poke",
-	"dance",
-	"cringe",
+	"marin-kitagawa",
+	"mori-calliope",
+	"raiden-shogun",
+	"oppai",
+	"selfies",
+	"uniform",
 }
 
 var nsfwAnimeCategories = []string{
-	"waifu",
-	"neko",
-	"trap",
-	"blowjob",
+	"ass",
+	"hentai",
+	"milf",
+	"oral",
+	"paizuri",
+	"ecchi",
+	"ero",
 }
 
 func init() {
 	createCommand("waifu", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) {
 		category := "waifu"
-		imgType := "sfw"
 
 		// Check for arguments
 		if len(args) > 0 {
@@ -71,7 +55,6 @@ func init() {
 				category = cLower
 			} else if contains(nsfwAnimeCategories, cLower) {
 				category = cLower
-				imgType = "nsfw"
 			} else if cLower == "categories" {
 				tLower := "sfw"
 
@@ -93,9 +76,9 @@ func init() {
 			}
 		}
 
-		resp, err := http.Get(fmt.Sprintf("https://api.waifu.pics/%s/%s", imgType, category))
+		resp, err := http.Get(fmt.Sprintf("https://api.waifu.im/search/?included_tags=%s", category))
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 			return
 		}
 		defer resp.Body.Close()
@@ -103,28 +86,29 @@ func init() {
 		var data animeResponse
 		err = json.NewDecoder(resp.Body).Decode(&data)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 			return
 		}
 
-		resp, err = http.Get(data.URL)
+		resp, err = http.Get(data.Images[0].Url)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 			return
 		}
 		defer resp.Body.Close()
 
 		mimeType := resp.Header.Get("Content-Type")
+		log.Println(mimeType)
 
 		buffer, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 			return
 		}
 
 		uploadResp, err := client.Upload(context.Background(), buffer, whatsmeow.MediaImage)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 			return
 		}
 
