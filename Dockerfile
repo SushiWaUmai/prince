@@ -1,6 +1,6 @@
 FROM golang:alpine AS builder
 RUN apk update
-RUN apk add musl-dev gcc
+RUN apk add musl-dev gcc alsa-lib-dev
 WORKDIR /
 
 ENV CGO_ENABLED=1
