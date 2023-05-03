@@ -24,25 +24,24 @@ func init() {
 		url := args[0]
 
 		ips, err := net.LookupIP(url)
-
-		var ipParse []string
-
 		if err != nil {
 			log.Println("Failed to get IPs")
 			return
 		}
 
+		var ipParse []string
+
 		ipParse = append(ipParse, "IPv4:")
 		for _, ip := range ips {
-			if isIPv4(ip.String()) {
+			if IsIPv4(ip.String()) {
 				ipParse = append(ipParse, ip.String())
 			}
 		}
 		ipParse = append(ipParse, "")
-		
+
 		ipParse = append(ipParse, "IPv6:")
 		for _, ip := range ips {
-			if isIPv6(ip.String()) {
+			if IsIPv6(ip.String()) {
 				ipParse = append(ipParse, ip.String())
 			}
 		}
@@ -58,10 +57,10 @@ func init() {
 
 }
 
-func isIPv4(address string) bool {
+func IsIPv4(address string) bool {
 	return strings.Count(address, ":") < 2
 }
 
-func isIPv6(address string) bool {
+func IsIPv6(address string) bool {
 	return strings.Count(address, ":") >= 2
 }
