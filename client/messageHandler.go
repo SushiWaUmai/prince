@@ -28,7 +28,7 @@ func (client *PrinceClient) handleMessage(e *events.Message) {
 
 	// split the command name with the arguments
 	split := strings.SplitN(content, " ", -1)
-	cmdName := split[0]
+	cmdName := strings.ToLower(split[0])
 	cmdArgs := split[1:]
 
 	for _, cmd := range commands.CommandList {
