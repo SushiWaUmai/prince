@@ -20,14 +20,20 @@ import (
 
 func init() {
 	createCommand("tts", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) {
-		if len(args) <= 0 {
-			client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
-				Conversation: proto.String("Please specify a text to speak"),
-			})
-			return
-		}
+		var text string
 
-		text := strings.Join(args, " ")
+		if ctx != nil && ctx.QuotedMessage != nil && ctx.QuotedMessage.Conversation != nil {
+			text = *ctx.QuotedMessage.Conversation
+		} else {
+			if len(args) <= 0 {
+				client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
+					Conversation: proto.String("Please specify a text to speak"),
+				})
+				return
+			}
+
+			text = strings.Join(args, " ")
+		}
 
 		speech := htgotts.Speech{
 			Folder:   ".",
