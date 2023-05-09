@@ -13,18 +13,29 @@ import (
 	waProto "go.mau.fi/whatsmeow/binary/proto"
 	"go.mau.fi/whatsmeow/types/events"
 	"google.golang.org/protobuf/proto"
+	"mvdan.cc/xurls/v2"
 )
+
+var rxStrict = xurls.Strict()
 
 func init() {
 	createCommand("fileurl", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) error {
-		if len(args) <= 0 {
+		var text string
+
+		if ctx != nil && ctx.QuotedMessage != nil && ctx.QuotedMessage.Conversation != nil {
+			text = *ctx.QuotedMessage.Conversation + " "
+		}
+
+		text += strings.Join(args, " ")
+		urls := rxStrict.FindAllString(text, -1)
+
+		if len(urls) <= 0 {
 			client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
 				Conversation: proto.String("Please specify a url"),
 			})
 			return errors.New("No fetch url provoided")
 		}
-
-		fetchUrl := args[0]
+		fetchUrl := urls[0]
 
 		resp, err := http.Get(fetchUrl)
 		if err != nil {
