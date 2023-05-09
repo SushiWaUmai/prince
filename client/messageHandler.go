@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/SushiWaUmai/prince/commands"
 	"github.com/SushiWaUmai/prince/db"
@@ -34,7 +35,33 @@ func (client *PrinceClient) handleMessage(e *events.Message) {
 	for _, cmd := range commands.CommandList {
 		if cmdName == cmd.Name {
 			log.Println("Runnning commmand", cmdName, "with args", cmdArgs)
+
+			client.wac.SendMessage(context.Background(), e.Info.Chat, &waProto.Message{
+				ReactionMessage: &waProto.ReactionMessage{
+					Key: &waProto.MessageKey{
+						RemoteJid: proto.String(e.Info.Chat.String()),
+						FromMe:    proto.Bool(true),
+						Id:        &e.Info.ID,
+					},
+					Text:              proto.String("⏳"),
+					SenderTimestampMs: proto.Int64(time.Now().UnixMilli()),
+				},
+			})
+
 			cmd.Execute(client.wac, e, ctx, cmdArgs)
+
+			client.wac.SendMessage(context.Background(), e.Info.Chat, &waProto.Message{
+				ReactionMessage: &waProto.ReactionMessage{
+					Key: &waProto.MessageKey{
+						RemoteJid: proto.String(e.Info.Chat.String()),
+						FromMe:    proto.Bool(true),
+						Id:        &e.Info.ID,
+					},
+					Text:              proto.String("👍"),
+					SenderTimestampMs: proto.Int64(time.Now().UnixMilli()),
+				},
+			})
+
 			log.Println("Done.")
 			break
 		}
