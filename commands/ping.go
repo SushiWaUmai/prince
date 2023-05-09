@@ -2,7 +2,6 @@ package commands
 
 import (
 	"context"
-	"log"
 
 	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
@@ -10,7 +9,7 @@ import (
 )
 
 func init() {
-	createCommand("ping", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) {
+	createCommand("ping", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) error {
 		reply := "pong!"
 		if len(args) > 0 {
 			reply = args[0]
@@ -21,7 +20,9 @@ func init() {
 		})
 
 		if err != nil {
-			log.Println(err)
+			return err
 		}
+
+		return nil
 	})
 }

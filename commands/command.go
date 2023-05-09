@@ -10,10 +10,10 @@ var CommandList []Command
 
 type Command struct {
 	Name    string
-	Execute func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string)
+	Execute func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) error
 }
 
-func createCommand(name string, execute func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string)) {
+func createCommand(name string, execute func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) error) {
 	CommandList = append(CommandList, Command{
 		Name:    name,
 		Execute: execute,

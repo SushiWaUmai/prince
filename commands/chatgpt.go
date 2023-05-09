@@ -2,7 +2,7 @@ package commands
 
 import (
 	"context"
-	"log"
+	"errors"
 	"strings"
 
 	"github.com/SushiWaUmai/prince/env"
@@ -16,7 +16,7 @@ import (
 var OpenAIClient = openai.NewClient(env.OPENAI_API_KEY)
 
 func init() {
-	createCommand("chatgpt", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) {
+	createCommand("chatgpt", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) error {
 		var prompt string
 
 		if ctx != nil && ctx.QuotedMessage != nil {
@@ -27,17 +27,17 @@ func init() {
 				audioData, err := client.Download(ctx.QuotedMessage.AudioMessage)
 				if err != nil {
 					client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
-						Conversation: proto.String("Failed to download the voice message"),
+						Conversation: proto.String("Failed to download voice message"),
 					})
-					return
+					return err
 				}
 
 				text, err := TranscribeAudio(audioData)
 				if err != nil {
 					client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
-						Conversation: proto.String("Failed to download the voice message"),
+						Conversation: proto.String("Failed to transcribe voice message"),
 					})
-					return
+					return err
 				}
 
 				prompt = text + "\n\n"
@@ -51,8 +51,7 @@ func init() {
 		prompt = strings.TrimSpace(prompt)
 
 		if len(prompt) <= 0 {
-			log.Println("Failed to generate openai response, no prompt was provided")
-			return
+			return errors.New("Failed to generate openai response, no prompt was provided")
 		}
 
 		resp, err := OpenAIClient.CreateChatCompletion(
@@ -69,8 +68,7 @@ func init() {
 		)
 
 		if err != nil {
-			log.Printf("ChatCompletion error: %v\n", err)
-			return
+			return err
 		}
 
 		reply := resp.Choices[0].Message.Content
@@ -80,7 +78,9 @@ func init() {
 		})
 
 		if err != nil {
-			log.Println(err)
+			return err
 		}
+
+		return nil
 	})
 }

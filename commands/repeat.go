@@ -2,8 +2,8 @@ package commands
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"log"
 	"strings"
 	"time"
 
@@ -16,7 +16,7 @@ import (
 )
 
 func init() {
-	createCommand("repeat", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) {
+	createCommand("repeat", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) error {
 		// 1. arg: start date xx.xx.xxxx
 		// 2. arg: repeat "Yearly","Monthly","Weekly","Daily"
 		// 3-n. arg: message
@@ -24,7 +24,7 @@ func init() {
 			client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
 				Conversation: proto.String("Usage: repeat <start date> <repeat> <message>"),
 			})
-			return
+			return errors.New("Not enough arguments")
 		}
 
 		// Get the date
@@ -33,7 +33,7 @@ func init() {
 			client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
 				Conversation: proto.String("Error parsing date. Please use format dd.mm.yyyy"),
 			})
-			return
+			return err
 		}
 
 		// Get the repeat
@@ -42,7 +42,7 @@ func init() {
 			client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
 				Conversation: proto.String("Error parsing repeat. Please use one of 'y', 'm', 'w' or 'd'"),
 			})
-			return
+			return errors.New("Could not parse repeat")
 		}
 
 		// Get the message
@@ -57,7 +57,9 @@ func init() {
 		})
 
 		if err != nil {
-			log.Println(err)
+			return err
 		}
+
+		return nil
 	})
 }

@@ -48,7 +48,16 @@ func (client *PrinceClient) handleMessage(e *events.Message) {
 				},
 			})
 
-			cmd.Execute(client.wac, e, ctx, cmdArgs)
+			err := cmd.Execute(client.wac, e, ctx, cmdArgs)
+
+			var reaction string
+
+			if err == nil {
+				reaction = "👍"
+			} else {
+				log.Println(err)
+				reaction = "❌"
+			}
 
 			client.wac.SendMessage(context.Background(), e.Info.Chat, &waProto.Message{
 				ReactionMessage: &waProto.ReactionMessage{
@@ -57,7 +66,7 @@ func (client *PrinceClient) handleMessage(e *events.Message) {
 						FromMe:    proto.Bool(true),
 						Id:        &e.Info.ID,
 					},
-					Text:              proto.String("👍"),
+					Text:              &reaction,
 					SenderTimestampMs: proto.Int64(time.Now().UnixMilli()),
 				},
 			})

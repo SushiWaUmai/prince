@@ -3,7 +3,6 @@ package commands
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
@@ -14,7 +13,7 @@ import (
 )
 
 func init() {
-	createCommand("clearrepeat", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) {
+	createCommand("clearrepeat", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) error {
 		// Delete the message
 		affected := db.ClearRepeatedMessage(messageEvent.Info.Chat.String())
 
@@ -24,7 +23,9 @@ func init() {
 		})
 
 		if err != nil {
-			log.Println(err)
+			return err
 		}
+
+		return nil
 	})
 }

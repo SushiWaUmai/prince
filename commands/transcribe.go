@@ -3,8 +3,8 @@ package commands
 import (
 	"bytes"
 	"context"
+	"errors"
 	"io"
-	"log"
 	"os"
 
 	openai "github.com/sashabaranov/go-openai"
@@ -16,13 +16,13 @@ import (
 )
 
 func init() {
-	createCommand("transcribe", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) {
+	createCommand("transcribe", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) error {
 		// Check if there's a voice message quoted
 		if ctx == nil || ctx.QuotedMessage == nil || ctx.QuotedMessage.AudioMessage == nil {
 			client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
 				Conversation: proto.String("Please reply to a voice message"),
 			})
-			return
+			return errors.New("No voice message quoted")
 		}
 
 		// Download the voice message
@@ -31,7 +31,7 @@ func init() {
 			client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
 				Conversation: proto.String("Failed to download the voice message"),
 			})
-			return
+			return err
 		}
 
 		// Use a Golang library to transcribe the audio to text
@@ -40,8 +40,7 @@ func init() {
 			client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
 				Conversation: proto.String("Failed to transcribe the audio file"),
 			})
-			log.Println(err)
-			return
+			return err
 		}
 
 		// Send the transcription back to the user
@@ -50,8 +49,10 @@ func init() {
 		})
 
 		if err != nil {
-			log.Println(err)
+			return err
 		}
+
+		return nil
 	})
 }
 

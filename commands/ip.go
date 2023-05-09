@@ -2,7 +2,7 @@ package commands
 
 import (
 	"context"
-	"log"
+	"errors"
 	"net"
 	"strings"
 
@@ -13,20 +13,19 @@ import (
 )
 
 func init() {
-	createCommand("ip", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) {
+	createCommand("ip", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) error {
 		if len(args) <= 0 {
 			client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
 				Conversation: proto.String("Please specify a url"),
 			})
-			return
+			return errors.New("No url provided")
 		}
 
 		url := args[0]
 
 		ips, err := net.LookupIP(url)
 		if err != nil {
-			log.Println("Failed to get IPs")
-			return
+			return err
 		}
 
 		var ipParse []string
@@ -51,8 +50,10 @@ func init() {
 		})
 
 		if err != nil {
-			log.Println(err)
+			return err
 		}
+
+		return nil
 	})
 
 }

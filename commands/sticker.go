@@ -3,13 +3,12 @@ package commands
 import (
 	"bytes"
 	"context"
+	"errors"
 	"image"
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
 	"net/http"
-
-	"log"
 
 	"github.com/chai2010/webp"
 	"go.mau.fi/whatsmeow"
@@ -19,24 +18,23 @@ import (
 )
 
 func init() {
-	createCommand("sticker", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) {
+	createCommand("sticker", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) error {
 		if ctx == nil || ctx.QuotedMessage == nil || ctx.QuotedMessage.ImageMessage == nil {
 			client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
 				Conversation: proto.String("Please reply to a image message"),
 			})
-			return
+			return errors.New("No ImageMessage quoted")
 		}
 		imgMsg := ctx.QuotedMessage.ImageMessage
 
 		buffer, err := client.Download(imgMsg)
 		if err != nil {
-			log.Println(err)
-			return
+			return err
 		}
 
 		img, _, err := image.Decode(bytes.NewReader(buffer))
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 		g := img.Bounds()
 
@@ -46,14 +44,12 @@ func init() {
 
 		webpByte, err := webp.EncodeRGBA(img, *proto.Float32(1))
 		if err != nil {
-			log.Fatal(err)
-			return
+			return err
 		}
 
 		uploadResp, err := client.Upload(context.Background(), webpByte, whatsmeow.MediaImage)
 		if err != nil {
-			log.Println(err)
-			return
+			return err
 		}
 
 		stickerMsg := &waProto.StickerMessage{
@@ -69,12 +65,18 @@ func init() {
 			Height:        &height,
 		}
 
-		client.SendMessage(
+		_, err = client.SendMessage(
 			context.Background(),
 			messageEvent.Info.Chat,
 			&waProto.Message{
 				StickerMessage: stickerMsg,
 			},
 		)
+
+		if err != nil {
+			return err
+		}
+
+		return nil
 	})
 }

@@ -2,7 +2,7 @@ package commands
 
 import (
 	"context"
-	"log"
+	"errors"
 	"net"
 	"strings"
 
@@ -16,12 +16,12 @@ import (
 var ipClient = ipinfo.NewClient(nil, nil, "")
 
 func init() {
-	createCommand("ipinfo", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) {
+	createCommand("ipinfo", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) error {
 		if len(args) <= 0 {
 			client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
 				Conversation: proto.String("Please specify a ip address"),
 			})
-			return
+			return errors.New("No ip address specified")
 		}
 
 		ipAddress := args[0]
@@ -29,8 +29,7 @@ func init() {
 		if !IsIPv4(ipAddress) || !IsIPv6(ipAddress) {
 			ips, err := net.LookupIP(ipAddress)
 			if err != nil || len(ips) == 0 {
-				log.Println("Failed to get IPs")
-				return
+				return err
 			}
 
 			ipAddress = ips[0].String()
@@ -38,10 +37,7 @@ func init() {
 
 		info, err := ipClient.GetIPInfo(net.ParseIP(ipAddress))
 		if err != nil {
-			client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
-				Conversation: proto.String("Failed fetch info"),
-			})
-			return
+			return err
 		}
 
 		var infoParse []string
@@ -61,8 +57,10 @@ func init() {
 		})
 
 		if err != nil {
-			log.Println(err)
+			return err
 		}
+
+		return nil
 	})
 
 }

@@ -3,9 +3,9 @@ package commands
 import (
 	"bytes"
 	"context"
+	"errors"
 	"image"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strings"
 
@@ -16,12 +16,12 @@ import (
 )
 
 func init() {
-	createCommand("fileurl", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) {
+	createCommand("fileurl", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) error {
 		if len(args) <= 0 {
 			client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
-				Conversation: proto.String("Please specify a fetchUrl"),
+				Conversation: proto.String("Please specify a url"),
 			})
-			return
+			return errors.New("No fetch url provoided")
 		}
 
 		fetchUrl := args[0]
@@ -29,29 +29,27 @@ func init() {
 		resp, err := http.Get(fetchUrl)
 		if err != nil {
 			client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
-				Conversation: proto.String("Failed fetch Url"),
+				Conversation: proto.String("Failed fetch url"),
 			})
-			return
+			return errors.New("Failed to fetch url")
 		}
 
 		mimeType := resp.Header.Get("Content-Type")
 
 		buffer, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			log.Println(err)
-			return
+			return err
 		}
 
 		if strings.Contains(mimeType, "image") {
 			uploadResp, err := client.Upload(context.Background(), buffer, whatsmeow.MediaImage)
 			if err != nil {
-				log.Println(err)
-				return
+				return err
 			}
 
 			img, _, err := image.Decode(bytes.NewBuffer(buffer))
 			if err != nil {
-				log.Fatal(err)
+				return err
 			}
 			g := img.Bounds()
 
@@ -78,8 +76,7 @@ func init() {
 		} else if strings.Contains(mimeType, "audio") {
 			uploadResp, err := client.Upload(context.Background(), buffer, whatsmeow.MediaAudio)
 			if err != nil {
-				log.Println(err)
-				return
+				return err
 			}
 
 			audioMsg := &waProto.AudioMessage{
@@ -99,7 +96,9 @@ func init() {
 		}
 
 		if err != nil {
-			log.Println(err)
+			return err
 		}
+
+		return nil
 	})
 }

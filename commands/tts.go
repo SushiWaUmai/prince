@@ -3,8 +3,8 @@ package commands
 import (
 	"bytes"
 	"context"
+	"errors"
 	"io"
-	"log"
 
 	"os"
 	"strings"
@@ -19,7 +19,7 @@ import (
 )
 
 func init() {
-	createCommand("tts", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) {
+	createCommand("tts", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) error {
 		var text string
 
 		if ctx != nil && ctx.QuotedMessage != nil && ctx.QuotedMessage.Conversation != nil {
@@ -29,7 +29,7 @@ func init() {
 				client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
 					Conversation: proto.String("Please specify a text to speak"),
 				})
-				return
+				return errors.New("No Text specified")
 			}
 
 			text = strings.Join(args, " ")
@@ -49,8 +49,7 @@ func init() {
 
 		uploadResp, err := client.Upload(context.Background(), audioBytes, whatsmeow.MediaAudio)
 		if err != nil {
-			log.Println(err)
-			return
+			return err
 		}
 
 		audioMsg := &waProto.AudioMessage{
@@ -68,8 +67,10 @@ func init() {
 		})
 
 		if err != nil {
-			log.Println(err)
+			return err
 		}
+
+		return nil
 	})
 }
 
@@ -94,7 +95,7 @@ func mp3ToOgg(audioData []byte) ([]byte, error) {
 
 	err = ffmpeg.Input(tmpFile.Name()).Output(tmpFileOut.Name(), ffmpeg.KwArgs{
 		"acodec": "libmp3lame",
-		"c:a": "libopus",
+		"c:a":    "libopus",
 	}).OverWriteOutput().Run()
 
 	if err != nil {
