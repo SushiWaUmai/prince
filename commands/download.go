@@ -17,26 +17,32 @@ import (
 	"mvdan.cc/xurls/v2"
 )
 
-var rxStrict = xurls.Strict()
-
 func init() {
+	rxStrict := xurls.Strict()
+
 	createCommand("download", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) error {
 		var text string
 
-		if ctx != nil && ctx.QuotedMessage != nil && ctx.QuotedMessage.Conversation != nil {
-			text = *ctx.QuotedMessage.Conversation + " "
+		if ctx != nil && ctx.QuotedMessage != nil {
+			if ctx.QuotedMessage.Conversation != nil {
+				text = *ctx.QuotedMessage.Conversation + " "
+			}
+
+			if ctx.QuotedMessage.ExtendedTextMessage != nil && ctx.QuotedMessage.ExtendedTextMessage.Text != nil {
+				text = *ctx.QuotedMessage.ExtendedTextMessage.Text + " "
+			}
 		}
 
 		text += strings.Join(args, " ")
-		urls := rxStrict.FindAllString(text, -1)
 
-		if len(urls) <= 0 {
+		fetchUrl := rxStrict.FindString(text)
+
+		if fetchUrl == "" {
 			client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
 				Conversation: proto.String("Please specify a url"),
 			})
 			return errors.New("No fetch url provoided")
 		}
-		fetchUrl := urls[0]
 
 		resp, err := http.Get(fetchUrl)
 		if err != nil {
