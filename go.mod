@@ -12,6 +12,7 @@ require (
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/sashabaranov/go-openai v1.7.0
 	github.com/u2takey/ffmpeg-go v0.4.1
+	github.com/wader/goutubedl v0.0.0-20230503164948-cef23e8d43d4
 	go.mau.fi/whatsmeow v0.0.0-20230410091758-46e30e265256
 	google.golang.org/protobuf v1.28.1
 	gorm.io/driver/sqlite v1.5.0

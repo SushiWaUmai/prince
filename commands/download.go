@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/wader/goutubedl"
 	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
 	"go.mau.fi/whatsmeow/types/events"
@@ -103,7 +104,42 @@ func init() {
 			_, err = client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
 				AudioMessage: audioMsg,
 			})
+		} else {
+			// yt-dlp
+			goutubedl.Path = "yt-dlp"
+			result, err := goutubedl.New(context.Background(), fetchUrl, goutubedl.Options{})
+			if err != nil {
+				return err
+			}
+			downloadResult, err := result.Download(context.Background(), "best")
+			if err != nil {
+				return err
+			}
+			defer downloadResult.Close()
 
+			buffer, err := ioutil.ReadAll(downloadResult)
+			if err != nil {
+				return err
+			}
+
+			uploadResp, err := client.Upload(context.Background(), buffer, whatsmeow.MediaVideo)
+			if err != nil {
+				return err
+			}
+
+			videoMsg := &waProto.VideoMessage{
+				Mimetype:      proto.String(http.DetectContentType(buffer)),
+				Url:           &uploadResp.URL,
+				DirectPath:    &uploadResp.DirectPath,
+				MediaKey:      uploadResp.MediaKey,
+				FileEncSha256: uploadResp.FileEncSHA256,
+				FileSha256:    uploadResp.FileSHA256,
+				FileLength:    &uploadResp.FileLength,
+			}
+
+			_, err = client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
+				VideoMessage: videoMsg,
+			})
 		}
 
 		if err != nil {
