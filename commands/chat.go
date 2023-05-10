@@ -14,6 +14,8 @@ import (
 )
 
 var OpenAIClient = openai.NewClient(env.OPENAI_API_KEY)
+
+// TODO: Move this to database
 var PastMessages = make([]openai.ChatCompletionMessage, 0)
 
 func init() {
@@ -64,12 +66,7 @@ func init() {
 			context.Background(),
 			openai.ChatCompletionRequest{
 				Model: openai.GPT3Dot5Turbo,
-				Messages: []openai.ChatCompletionMessage{
-					{
-						Role:    openai.ChatMessageRoleUser,
-						Content: prompt,
-					},
-				},
+				Messages: PastMessages,
 			},
 		)
 
