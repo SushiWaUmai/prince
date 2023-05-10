@@ -14,9 +14,10 @@ import (
 )
 
 var OpenAIClient = openai.NewClient(env.OPENAI_API_KEY)
+var PastMessages = make([]openai.ChatCompletionMessage, 0)
 
 func init() {
-	createCommand("chatgpt", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) error {
+	createCommand("chat", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) error {
 		var prompt string
 
 		if ctx != nil && ctx.QuotedMessage != nil {
@@ -54,6 +55,11 @@ func init() {
 			return errors.New("Failed to generate openai response, no prompt was provided")
 		}
 
+		PastMessages = append(PastMessages, openai.ChatCompletionMessage{
+			Role:    openai.ChatMessageRoleUser,
+			Content: prompt,
+		})
+
 		resp, err := OpenAIClient.CreateChatCompletion(
 			context.Background(),
 			openai.ChatCompletionRequest{
@@ -72,6 +78,11 @@ func init() {
 		}
 
 		reply := resp.Choices[0].Message.Content
+
+		PastMessages = append(PastMessages, openai.ChatCompletionMessage{
+			Role:    openai.ChatMessageRoleAssistant,
+			Content: reply,
+		})
 
 		_, err = client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
 			Conversation: &reply,
