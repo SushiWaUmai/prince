@@ -79,7 +79,7 @@ func (client *PrinceClient) register() {
 func (client *PrinceClient) eventHandler(evt interface{}) {
 	switch v := evt.(type) {
 	case *events.Message:
-		client.handleMessage(v)
+		go client.handleMessage(v)
 	}
 }
 
