@@ -22,6 +22,7 @@ require (
 
 require (
 	filippo.io/edwards25519 v1.0.0 // indirect
+	github.com/aethiopicuschan/voicevox v1.0.0 // indirect
 	github.com/aws/aws-sdk-go v1.38.20 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hajimehoshi/go-mp3 v0.3.3 // indirect

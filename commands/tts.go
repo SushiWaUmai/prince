@@ -45,7 +45,7 @@ func init() {
 
 		// get the bytes
 		audioBytes, err := os.ReadFile("speach.mp3")
-		audioBytes, err = mp3ToOgg(audioBytes)
+		audioBytes, err = toOgg(audioBytes)
 
 		uploadResp, err := client.Upload(context.Background(), audioBytes, whatsmeow.MediaAudio)
 		if err != nil {
@@ -74,9 +74,9 @@ func init() {
 	})
 }
 
-func mp3ToOgg(audioData []byte) ([]byte, error) {
+func toOgg(audioData []byte) ([]byte, error) {
 	// ffmpeg -i $inFileName -acodec libmp3lame -y $outFileName
-	tmpFile, err := os.CreateTemp("", "audio*.mp3")
+	tmpFile, err := os.CreateTemp("", "audio")
 	if err != nil {
 		return nil, err
 	}
