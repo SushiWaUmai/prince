@@ -8,9 +8,9 @@ import (
 )
 
 func init() {
-	createCommand("clearchat", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) error {
+	createCommand("clearchat", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		PastMessages = make([]openai.ChatCompletionMessage, 0)
 
-		return nil
+		return nil, nil
 	})
 }

@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/SushiWaUmai/prince/env"
+	"github.com/SushiWaUmai/prince/utils"
 	"github.com/aethiopicuschan/voicevox"
 	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
@@ -18,7 +19,7 @@ func init() {
 	voicevox := voicevox.NewClient("http", fmt.Sprintf("%s:50021", env.VOICEVOX_ENDPOINT))
 	zundamonIdx := 1
 
-	createCommand("zundamon", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) error {
+	createCommand("zundamon", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		var text string
 		pipeString, _ := GetTextContext(pipe)
 
@@ -26,10 +27,10 @@ func init() {
 			text = pipeString
 		} else {
 			if len(args) <= 0 {
-				client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
+				response := &waProto.Message{
 					Conversation: proto.String("Please specify a text to speak"),
-				})
-				return errors.New("No Text specified")
+				}
+				return response, errors.New("No Text specified")
 			}
 
 			text = strings.Join(args, " ")
@@ -38,19 +39,19 @@ func init() {
 		query, err := voicevox.CreateQuery(zundamonIdx, text)
 
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		wav, err := voicevox.CreateVoice(1, true, query)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
-		audioBytes, err := toOgg(wav)
+		audioBytes, err := utils.ToOgg(wav)
 
 		uploadResp, err := client.Upload(context.Background(), audioBytes, whatsmeow.MediaAudio)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		audioMsg := &waProto.AudioMessage{
@@ -64,13 +65,13 @@ func init() {
 		}
 
 		if err != nil {
-			return err
+			return nil, err
 		}
 
-		_, err = client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
+		response := &waProto.Message{
 			AudioMessage: audioMsg,
-		})
+		}
 
-		return nil
+		return response, nil
 	})
 }

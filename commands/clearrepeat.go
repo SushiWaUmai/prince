@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"context"
 	"fmt"
 
 	"go.mau.fi/whatsmeow"
@@ -13,19 +12,15 @@ import (
 )
 
 func init() {
-	createCommand("clearrepeat", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) error {
+	createCommand("clearrepeat", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		// Delete the message
 		affected := db.ClearRepeatedMessage(messageEvent.Info.Chat.String())
 
 		// Reply
-		_, err := client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
+		response := &waProto.Message{
 			Conversation: proto.String(fmt.Sprintf("Deleted %d", affected)),
-		})
-
-		if err != nil {
-			return err
 		}
 
-		return nil
+		return response, nil
 	})
 }

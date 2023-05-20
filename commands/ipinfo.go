@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"context"
 	"errors"
 	"net"
 	"strings"
@@ -16,13 +15,13 @@ import (
 var ipClient = ipinfo.NewClient(nil, nil, "")
 
 func init() {
-	createCommand("ipinfo", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) error {
+	createCommand("ipinfo", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		pipeString, _ := GetTextContext(pipe)
 		if pipeString == "" && len(args) <= 0 {
-			client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
+			response := &waProto.Message{
 				Conversation: proto.String("Please specify a ip address"),
-			})
-			return errors.New("No ip address specified")
+			}
+			return response, errors.New("No ip address specified")
 		}
 
 		var ipAddress string
@@ -35,7 +34,7 @@ func init() {
 		if !IsIPv4(ipAddress) || !IsIPv6(ipAddress) {
 			ips, err := net.LookupIP(ipAddress)
 			if err != nil || len(ips) == 0 {
-				return err
+				return nil, err
 			}
 
 			ipAddress = ips[0].String()
@@ -43,7 +42,7 @@ func init() {
 
 		info, err := ipClient.GetIPInfo(net.ParseIP(ipAddress))
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		var infoParse []string
@@ -58,15 +57,10 @@ func init() {
 		infoParse = append(infoParse, "Location: "+info.Location)
 		infoParse = append(infoParse, "Organization: "+info.Org)
 
-		_, err = client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
+		response := &waProto.Message{
 			Conversation: proto.String(strings.Join(infoParse, "\n")),
-		})
-
-		if err != nil {
-			return err
 		}
-
-		return nil
+		return response, nil
 	})
 
 }

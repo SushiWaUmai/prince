@@ -17,7 +17,7 @@ import (
 var PastMessages = make([]openai.ChatCompletionMessage, 0)
 
 func init() {
-	createCommand("chat", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) error {
+	createCommand("chat", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		var prompt string
 
 		pipeString, _ := GetTextContext(pipe)
@@ -32,7 +32,7 @@ func init() {
 				client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
 					Conversation: proto.String("Failed to download voice message"),
 				})
-				return err
+				return nil, err
 			}
 
 			text, err := utils.TranscribeAudio(audioData)
@@ -40,7 +40,7 @@ func init() {
 				client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
 					Conversation: proto.String("Failed to transcribe voice message"),
 				})
-				return err
+				return nil, err
 			}
 
 			prompt = text + "\n\n"
@@ -53,7 +53,7 @@ func init() {
 		prompt = strings.TrimSpace(prompt)
 
 		if len(prompt) <= 0 {
-			return errors.New("Failed to generate openai response, no prompt was provided")
+			return nil, errors.New("Failed to generate openai response, no prompt was provided")
 		}
 
 		PastMessages = append(PastMessages, openai.ChatCompletionMessage{
@@ -70,7 +70,7 @@ func init() {
 		)
 
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		reply := resp.Choices[0].Message.Content
@@ -80,14 +80,10 @@ func init() {
 			Content: reply,
 		})
 
-		_, err = client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
+		response := &waProto.Message{
 			Conversation: &reply,
-		})
-
-		if err != nil {
-			return err
 		}
 
-		return nil
+		return response, nil
 	})
 }

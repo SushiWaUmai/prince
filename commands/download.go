@@ -20,7 +20,7 @@ import (
 func init() {
 	rxStrict := xurls.Strict()
 
-	createCommand("download", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) error {
+	createCommand("download", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		text, _ := GetTextContext(pipe)
 		text += " "
 
@@ -29,36 +29,36 @@ func init() {
 		fetchUrl := rxStrict.FindString(text)
 
 		if fetchUrl == "" {
-			client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
+			response := &waProto.Message{
 				Conversation: proto.String("Please specify a url"),
-			})
-			return errors.New("No fetch url provoided")
+			}
+			return response, errors.New("No fetch url provoided")
 		}
 
 		resp, err := http.Get(fetchUrl)
 		if err != nil {
-			client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
+			response := &waProto.Message{
 				Conversation: proto.String("Failed fetch url"),
-			})
-			return errors.New("Failed to fetch url")
+			}
+			return response, errors.New("Failed to fetch url")
 		}
 
 		mimeType := resp.Header.Get("Content-Type")
 
 		buffer, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if strings.Contains(mimeType, "image") {
 			uploadResp, err := client.Upload(context.Background(), buffer, whatsmeow.MediaImage)
 			if err != nil {
-				return err
+				return nil, err
 			}
 
 			img, _, err := image.Decode(bytes.NewBuffer(buffer))
 			if err != nil {
-				return err
+				return nil, err
 			}
 			g := img.Bounds()
 
@@ -78,14 +78,14 @@ func init() {
 				Height:        &height,
 			}
 
-			_, err = client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
+			response := &waProto.Message{
 				ImageMessage: imgMsg,
-			})
-
+			}
+			return response, nil
 		} else if strings.Contains(mimeType, "audio") {
 			uploadResp, err := client.Upload(context.Background(), buffer, whatsmeow.MediaAudio)
 			if err != nil {
-				return err
+				return nil, err
 			}
 
 			audioMsg := &waProto.AudioMessage{
@@ -98,30 +98,31 @@ func init() {
 				FileLength:    &uploadResp.FileLength,
 			}
 
-			_, err = client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
+			response := &waProto.Message{
 				AudioMessage: audioMsg,
-			})
+			}
+			return response, nil
 		} else {
 			// yt-dlp
 			goutubedl.Path = "yt-dlp"
 			result, err := goutubedl.New(context.Background(), fetchUrl, goutubedl.Options{})
 			if err != nil {
-				return err
+				return nil, err
 			}
 			downloadResult, err := result.Download(context.Background(), "best")
 			if err != nil {
-				return err
+				return nil, err
 			}
 			defer downloadResult.Close()
 
 			buffer, err := ioutil.ReadAll(downloadResult)
 			if err != nil {
-				return err
+				return nil, err
 			}
 
 			uploadResp, err := client.Upload(context.Background(), buffer, whatsmeow.MediaVideo)
 			if err != nil {
-				return err
+				return nil, err
 			}
 
 			videoMsg := &waProto.VideoMessage{
@@ -134,15 +135,10 @@ func init() {
 				FileLength:    &uploadResp.FileLength,
 			}
 
-			_, err = client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
+			response := &waProto.Message{
 				VideoMessage: videoMsg,
-			})
+			}
+			return response, nil
 		}
-
-		if err != nil {
-			return err
-		}
-
-		return nil
 	})
 }

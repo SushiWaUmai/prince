@@ -53,7 +53,7 @@ func (client *PrinceClient) handleMessage(e *events.Message) {
 			if ctx != nil {
 				pipe = ctx.QuotedMessage
 			}
-			err := cmd.Execute(client.wac, e, ctx, pipe, cmdArgs)
+			msg, err := cmd.Execute(client.wac, e, ctx, pipe, cmdArgs)
 
 			if err == nil {
 				reaction = "👍"
@@ -73,6 +73,10 @@ func (client *PrinceClient) handleMessage(e *events.Message) {
 					SenderTimestampMs: proto.Int64(time.Now().UnixMilli()),
 				},
 			})
+
+			if msg != nil {
+				client.wac.SendMessage(context.Background(), e.Info.Chat, msg)
+			}
 
 			log.Println("Done.")
 			break

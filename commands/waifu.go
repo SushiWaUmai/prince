@@ -48,7 +48,7 @@ var nsfwAnimeCategories = []string{
 }
 
 func init() {
-	createCommand("waifu", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) error {
+	createCommand("waifu", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		category := "waifu"
 
 		// Check for arguments
@@ -72,29 +72,29 @@ func init() {
 					msg += strings.Join(animeCategories, ", ")
 				}
 
-				client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
+				response := &waProto.Message{
 					Conversation: &msg,
-				})
+				}
 
-				return nil
+				return response, nil
 			}
 		}
 
 		resp, err := http.Get(fmt.Sprintf("https://api.waifu.im/search/?included_tags=%s", category))
 		if err != nil {
-			return err
+			return nil, err
 		}
 		defer resp.Body.Close()
 
 		var data animeResponse
 		err = json.NewDecoder(resp.Body).Decode(&data)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		resp, err = http.Get(data.Images[0].Url)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		defer resp.Body.Close()
 
@@ -102,17 +102,17 @@ func init() {
 
 		buffer, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		uploadResp, err := client.Upload(context.Background(), buffer, whatsmeow.MediaImage)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		img, _, err := image.Decode(bytes.NewBuffer(buffer))
 		if err != nil {
-			return err
+			return nil, err
 		}
 		g := img.Bounds()
 
@@ -132,15 +132,10 @@ func init() {
 			Height:        &height,
 		}
 
-		_, err = client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
+		response := &waProto.Message{
 			ImageMessage: imgMsg,
-		})
-
-		if err != nil {
-			return err
 		}
-
-		return nil
+		return response, nil
 	})
 }
 

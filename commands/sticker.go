@@ -18,23 +18,23 @@ import (
 )
 
 func init() {
-	createCommand("sticker", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) error {
+	createCommand("sticker", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		if pipe == nil || pipe.ImageMessage == nil {
-			client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
+			response := &waProto.Message{
 				Conversation: proto.String("Please reply to a image message"),
-			})
-			return errors.New("No ImageMessage quoted")
+			}
+			return response, errors.New("No ImageMessage quoted")
 		}
 		imgMsg := pipe.ImageMessage
 
 		buffer, err := client.Download(imgMsg)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		img, _, err := image.Decode(bytes.NewReader(buffer))
 		if err != nil {
-			return err
+			return nil, err
 		}
 		g := img.Bounds()
 
@@ -44,12 +44,12 @@ func init() {
 
 		webpByte, err := webp.EncodeRGBA(img, *proto.Float32(1))
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		uploadResp, err := client.Upload(context.Background(), webpByte, whatsmeow.MediaImage)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		stickerMsg := &waProto.StickerMessage{
@@ -65,18 +65,9 @@ func init() {
 			Height:        &height,
 		}
 
-		_, err = client.SendMessage(
-			context.Background(),
-			messageEvent.Info.Chat,
-			&waProto.Message{
-				StickerMessage: stickerMsg,
-			},
-		)
-
-		if err != nil {
-			return err
+		response := &waProto.Message{
+			StickerMessage: stickerMsg,
 		}
-
-		return nil
+		return response, nil
 	})
 }

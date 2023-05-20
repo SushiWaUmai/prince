@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"context"
 	"errors"
 	"net"
 	"strings"
@@ -13,13 +12,13 @@ import (
 )
 
 func init() {
-	createCommand("ip", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) error {
+	createCommand("ip", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		pipeString, _ := GetTextContext(pipe)
 		if pipeString == "" && len(args) <= 0 {
-			client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
+			response := &waProto.Message{
 				Conversation: proto.String("Please specify a url"),
-			})
-			return errors.New("No url provided")
+			}
+			return response, errors.New("No url provided")
 		}
 
 		var url string
@@ -31,7 +30,7 @@ func init() {
 
 		ips, err := net.LookupIP(url)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		var ipParse []string
@@ -51,15 +50,10 @@ func init() {
 			}
 		}
 
-		_, err = client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
+		response := &waProto.Message{
 			Conversation: proto.String(strings.Join(ipParse, "\n")),
-		})
-
-		if err != nil {
-			return err
 		}
-
-		return nil
+		return response, nil
 	})
 
 }
