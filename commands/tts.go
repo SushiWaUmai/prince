@@ -41,7 +41,7 @@ func init() {
 
 		// get the bytes
 		audioBytes, err := os.ReadFile("speach.mp3")
-		audioBytes, err = utils.ToOgg(audioBytes)
+		audioBytes, err = utils.Mp3ToOgg(audioBytes)
 
 		uploadResp, err := client.Upload(context.Background(), audioBytes, whatsmeow.MediaAudio)
 		if err != nil {

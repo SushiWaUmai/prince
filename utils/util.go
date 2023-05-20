@@ -38,9 +38,17 @@ func OggToMp3(audioData []byte) ([]byte, error) {
 	return os.ReadFile(tmpFileOut.Name())
 }
 
+func Mp3ToOgg(audioData []byte) ([]byte, error) {
+	return toOgg(audioData, "audio*.mp3")
+}
+
 func ToOgg(audioData []byte) ([]byte, error) {
+	return toOgg(audioData, "audio")
+}
+
+func toOgg(audioData []byte, fileName string) ([]byte, error) {
 	// ffmpeg -i $inFileName -acodec libmp3lame -y $outFileName
-	tmpFile, err := os.CreateTemp("", "audio")
+	tmpFile, err := os.CreateTemp("", fileName)
 	if err != nil {
 		return nil, err
 	}
