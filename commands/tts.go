@@ -19,12 +19,10 @@ import (
 )
 
 func init() {
-	createCommand("tts", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe string, args []string) error {
-		var text string
+	createCommand("tts", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) error {
+		text, _ := GetTextContext(pipe)
 
-		if ctx != nil && ctx.QuotedMessage != nil && ctx.QuotedMessage.Conversation != nil {
-			text = *ctx.QuotedMessage.Conversation
-		} else {
+		if text == "" {
 			if len(args) <= 0 {
 				client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
 					Conversation: proto.String("Please specify a text to speak"),

@@ -18,14 +18,14 @@ import (
 )
 
 func init() {
-	createCommand("sticker", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe string, args []string) error {
-		if ctx == nil || ctx.QuotedMessage == nil || ctx.QuotedMessage.ImageMessage == nil {
+	createCommand("sticker", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) error {
+		if pipe == nil || pipe.ImageMessage == nil {
 			client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
 				Conversation: proto.String("Please reply to a image message"),
 			})
 			return errors.New("No ImageMessage quoted")
 		}
-		imgMsg := ctx.QuotedMessage.ImageMessage
+		imgMsg := pipe.ImageMessage
 
 		buffer, err := client.Download(imgMsg)
 		if err != nil {

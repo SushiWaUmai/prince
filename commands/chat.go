@@ -17,34 +17,33 @@ import (
 var PastMessages = make([]openai.ChatCompletionMessage, 0)
 
 func init() {
-	createCommand("chat", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe string, args []string) error {
+	createCommand("chat", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) error {
 		var prompt string
 
-		if pipe != "" {
-			prompt = pipe + "\n\n"
+		pipeString, _ := GetTextContext(pipe)
+		if pipeString != "" {
+			prompt = pipeString + "\n\n"
 		}
 
-		if ctx != nil && ctx.QuotedMessage != nil {
-			if ctx.QuotedMessage.AudioMessage != nil {
-				// Download the voice message
-				audioData, err := client.Download(ctx.QuotedMessage.AudioMessage)
-				if err != nil {
-					client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
-						Conversation: proto.String("Failed to download voice message"),
-					})
-					return err
-				}
-
-				text, err := utils.TranscribeAudio(audioData)
-				if err != nil {
-					client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
-						Conversation: proto.String("Failed to transcribe voice message"),
-					})
-					return err
-				}
-
-				prompt = text + "\n\n"
+		if pipe != nil && pipe.AudioMessage != nil {
+			// Download the voice message
+			audioData, err := client.Download(pipe.AudioMessage)
+			if err != nil {
+				client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
+					Conversation: proto.String("Failed to download voice message"),
+				})
+				return err
 			}
+
+			text, err := utils.TranscribeAudio(audioData)
+			if err != nil {
+				client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
+					Conversation: proto.String("Failed to transcribe voice message"),
+				})
+				return err
+			}
+
+			prompt = text + "\n\n"
 		}
 
 		if len(args) > 0 {

@@ -13,8 +13,9 @@ import (
 )
 
 func init() {
-	createCommand("ip", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe string, args []string) error {
-		if pipe == "" && len(args) <= 0 {
+	createCommand("ip", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) error {
+		pipeString, _ := GetTextContext(pipe)
+		if pipeString == "" && len(args) <= 0 {
 			client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
 				Conversation: proto.String("Please specify a url"),
 			})
@@ -22,8 +23,8 @@ func init() {
 		}
 
 		var url string
-		if pipe != "" {
-			url = pipe
+		if pipeString != "" {
+			url = pipeString
 		} else {
 			url = args[0]
 		}

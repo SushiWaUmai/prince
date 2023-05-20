@@ -12,9 +12,9 @@ import (
 )
 
 func init() {
-	createCommand("transcribe", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe string, args []string) error {
+	createCommand("transcribe", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) error {
 		// Check if there's a voice message quoted
-		if ctx == nil || ctx.QuotedMessage == nil || ctx.QuotedMessage.AudioMessage == nil {
+		if pipe.AudioMessage == nil {
 			client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
 				Conversation: proto.String("Please reply to a voice message"),
 			})
@@ -22,7 +22,7 @@ func init() {
 		}
 
 		// Download the voice message
-		audioData, err := client.Download(ctx.QuotedMessage.AudioMessage)
+		audioData, err := client.Download(pipe.AudioMessage)
 		if err != nil {
 			client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
 				Conversation: proto.String("Failed to download the voice message"),

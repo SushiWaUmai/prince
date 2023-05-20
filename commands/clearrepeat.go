@@ -13,7 +13,7 @@ import (
 )
 
 func init() {
-	createCommand("clearrepeat", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe string, args []string) error {
+	createCommand("clearrepeat", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) error {
 		// Delete the message
 		affected := db.ClearRepeatedMessage(messageEvent.Info.Chat.String())
 

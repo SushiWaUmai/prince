@@ -19,7 +19,7 @@ func (client *PrinceClient) handleMessage(e *events.Message) {
 		return
 	}
 
-	content, ctx := commands.GetTextContext(e)
+	content, ctx := commands.GetTextContext(e.Message)
 
 	if !strings.HasPrefix(content, client.commandPrefix) {
 		return
@@ -48,19 +48,7 @@ func (client *PrinceClient) handleMessage(e *events.Message) {
 				},
 			})
 
-			var pipe = ""
-
-			if ctx != nil && ctx.QuotedMessage != nil {
-				if ctx.QuotedMessage.Conversation != nil {
-					pipe = *ctx.QuotedMessage.Conversation
-				}
-
-				if ctx.QuotedMessage.ExtendedTextMessage != nil && ctx.QuotedMessage.ExtendedTextMessage.Text != nil {
-					pipe = *ctx.QuotedMessage.ExtendedTextMessage.Text
-				}
-			}
-
-			err := cmd.Execute(client.wac, e, ctx, pipe, cmdArgs)
+			err := cmd.Execute(client.wac, e, ctx, ctx.QuotedMessage, cmdArgs)
 
 			var reaction string
 

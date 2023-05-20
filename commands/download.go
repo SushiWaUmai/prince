@@ -20,8 +20,9 @@ import (
 func init() {
 	rxStrict := xurls.Strict()
 
-	createCommand("download", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe string, args []string) error {
-		var text = pipe + " "
+	createCommand("download", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) error {
+		text, _ := GetTextContext(pipe)
+		text += " "
 
 		text += strings.Join(args, " ")
 
