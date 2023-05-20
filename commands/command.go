@@ -6,7 +6,7 @@ import (
 	"go.mau.fi/whatsmeow/types/events"
 )
 
-var CommandList []Command
+var CommandMap map[string]Command = make(map[string]Command)
 
 type Command struct {
 	Name    string
@@ -14,10 +14,10 @@ type Command struct {
 }
 
 func createCommand(name string, execute func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error)) {
-	CommandList = append(CommandList, Command{
+	CommandMap[name] = Command{
 		Name:    name,
 		Execute: execute,
-	})
+	}
 }
 
 func GetTextContext(msg *waProto.Message) (string, *waProto.ContextInfo) {

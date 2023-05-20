@@ -32,56 +32,56 @@ func (client *PrinceClient) handleMessage(e *events.Message) {
 	cmdName := strings.ToLower(split[0])
 	cmdArgs := split[1:]
 
-	for _, cmd := range commands.CommandList {
-		if cmdName == cmd.Name {
-			log.Println("Runnning commmand", cmdName, "with args", cmdArgs)
-			reaction := "⏳"
-
-			client.wac.SendMessage(context.Background(), e.Info.Chat, &waProto.Message{
-				ReactionMessage: &waProto.ReactionMessage{
-					Key: &waProto.MessageKey{
-						RemoteJid: proto.String(e.Info.Chat.String()),
-						FromMe:    proto.Bool(true),
-						Id:        &e.Info.ID,
-					},
-					Text:              &reaction,
-					SenderTimestampMs: proto.Int64(time.Now().UnixMilli()),
-				},
-			})
-
-			var pipe *waProto.Message = nil
-			if ctx != nil {
-				pipe = ctx.QuotedMessage
-			}
-			msg, err := cmd.Execute(client.wac, e, ctx, pipe, cmdArgs)
-
-			if err == nil {
-				reaction = "👍"
-			} else {
-				log.Println(err)
-				reaction = "❌"
-			}
-
-			client.wac.SendMessage(context.Background(), e.Info.Chat, &waProto.Message{
-				ReactionMessage: &waProto.ReactionMessage{
-					Key: &waProto.MessageKey{
-						RemoteJid: proto.String(e.Info.Chat.String()),
-						FromMe:    proto.Bool(true),
-						Id:        &e.Info.ID,
-					},
-					Text:              &reaction,
-					SenderTimestampMs: proto.Int64(time.Now().UnixMilli()),
-				},
-			})
-
-			if msg != nil {
-				client.wac.SendMessage(context.Background(), e.Info.Chat, msg)
-			}
-
-			log.Println("Done.")
-			break
-		}
+	cmd, ok := commands.CommandMap[cmdName]
+	if !ok {
+		return
 	}
+
+	log.Println("Runnning commmand", cmdName, "with args", cmdArgs)
+	reaction := "⏳"
+
+	client.wac.SendMessage(context.Background(), e.Info.Chat, &waProto.Message{
+		ReactionMessage: &waProto.ReactionMessage{
+			Key: &waProto.MessageKey{
+				RemoteJid: proto.String(e.Info.Chat.String()),
+				FromMe:    proto.Bool(true),
+				Id:        &e.Info.ID,
+			},
+			Text:              &reaction,
+			SenderTimestampMs: proto.Int64(time.Now().UnixMilli()),
+		},
+	})
+
+	var pipe *waProto.Message = nil
+	if ctx != nil {
+		pipe = ctx.QuotedMessage
+	}
+	msg, err := cmd.Execute(client.wac, e, ctx, pipe, cmdArgs)
+
+	if err == nil {
+		reaction = "👍"
+	} else {
+		log.Println(err)
+		reaction = "❌"
+	}
+
+	client.wac.SendMessage(context.Background(), e.Info.Chat, &waProto.Message{
+		ReactionMessage: &waProto.ReactionMessage{
+			Key: &waProto.MessageKey{
+				RemoteJid: proto.String(e.Info.Chat.String()),
+				FromMe:    proto.Bool(true),
+				Id:        &e.Info.ID,
+			},
+			Text:              &reaction,
+			SenderTimestampMs: proto.Int64(time.Now().UnixMilli()),
+		},
+	})
+
+	if msg != nil {
+		client.wac.SendMessage(context.Background(), e.Info.Chat, msg)
+	}
+
+	log.Println("Done.")
 }
 
 func (client *PrinceClient) sendRepeatedMessages() {
