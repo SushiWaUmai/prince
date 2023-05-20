@@ -19,6 +19,7 @@ func init() {
 		// 1. arg: start date xx.xx.xxxx
 		// 2. arg: repeat "Yearly","Monthly","Weekly","Daily"
 		// 3-n. arg: message
+    // TODO: use pipe
 		if len(args) < 3 {
 			repsonse := &waProto.Message{
 				Conversation: proto.String("Usage: repeat <start date> <repeat> <message>"),

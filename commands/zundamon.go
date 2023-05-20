@@ -21,19 +21,18 @@ func init() {
 
 	createCommand("zundamon", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		var text string
-		pipeString, _ := GetTextContext(pipe)
-
-		if pipeString != "" {
-			text = pipeString
-		} else {
-			if len(args) <= 0 {
-				response := &waProto.Message{
-					Conversation: proto.String("Please specify a text to speak"),
-				}
-				return response, errors.New("No Text specified")
-			}
-
+		if len(args) > 0 {
 			text = strings.Join(args, " ")
+		} else {
+			text, _ = GetTextContext(pipe)
+		}
+		text = strings.TrimSpace(text)
+
+		if text == "" {
+			response := &waProto.Message{
+				Conversation: proto.String("Please specify a text to speak"),
+			}
+			return response, errors.New("No Text specified")
 		}
 
 		query, err := voicevox.CreateQuery(zundamonIdx, text)

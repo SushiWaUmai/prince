@@ -18,17 +18,19 @@ import (
 
 func init() {
 	createCommand("tts", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
-		text, _ := GetTextContext(pipe)
+		var text string
+		if len(args) > 0 {
+			text = strings.Join(args, " ")
+		} else {
+			text, _ = GetTextContext(pipe)
+		}
+		text = strings.TrimSpace(text)
 
 		if text == "" {
-			if len(args) <= 0 {
-				response := &waProto.Message{
-					Conversation: proto.String("Please specify a text to speak"),
-				}
-				return response, errors.New("No Text specified")
+			response := &waProto.Message{
+				Conversation: proto.String("Please specify a text to speak"),
 			}
-
-			text = strings.Join(args, " ")
+			return response, errors.New("No Text specified")
 		}
 
 		speech := htgotts.Speech{
