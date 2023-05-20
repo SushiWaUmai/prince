@@ -35,6 +35,7 @@ func (client *PrinceClient) handleMessage(e *events.Message) {
 	for _, cmd := range commands.CommandList {
 		if cmdName == cmd.Name {
 			log.Println("Runnning commmand", cmdName, "with args", cmdArgs)
+			reaction := "⏳"
 
 			client.wac.SendMessage(context.Background(), e.Info.Chat, &waProto.Message{
 				ReactionMessage: &waProto.ReactionMessage{
@@ -43,14 +44,16 @@ func (client *PrinceClient) handleMessage(e *events.Message) {
 						FromMe:    proto.Bool(true),
 						Id:        &e.Info.ID,
 					},
-					Text:              proto.String("⏳"),
+					Text:              &reaction,
 					SenderTimestampMs: proto.Int64(time.Now().UnixMilli()),
 				},
 			})
 
-			err := cmd.Execute(client.wac, e, ctx, ctx.QuotedMessage, cmdArgs)
-
-			var reaction string
+			var pipe *waProto.Message = nil
+			if ctx != nil {
+				pipe = ctx.QuotedMessage
+			}
+			err := cmd.Execute(client.wac, e, ctx, pipe, cmdArgs)
 
 			if err == nil {
 				reaction = "👍"
