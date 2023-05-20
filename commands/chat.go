@@ -5,7 +5,7 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/SushiWaUmai/prince/env"
+	"github.com/SushiWaUmai/prince/utils"
 	openai "github.com/sashabaranov/go-openai"
 	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
@@ -13,19 +13,19 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-var OpenAIClient = openai.NewClient(env.OPENAI_API_KEY)
-
 // TODO: Move this to database
 var PastMessages = make([]openai.ChatCompletionMessage, 0)
 
 func init() {
-	createCommand("chat", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) error {
+	createCommand("chat", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe string, args []string) error {
 		var prompt string
 
+		if pipe != "" {
+			prompt = pipe + "\n\n"
+		}
+
 		if ctx != nil && ctx.QuotedMessage != nil {
-			if ctx.QuotedMessage.Conversation != nil {
-				prompt = *ctx.QuotedMessage.Conversation + "\n\n"
-			} else if ctx.QuotedMessage.AudioMessage != nil {
+			if ctx.QuotedMessage.AudioMessage != nil {
 				// Download the voice message
 				audioData, err := client.Download(ctx.QuotedMessage.AudioMessage)
 				if err != nil {
@@ -35,7 +35,7 @@ func init() {
 					return err
 				}
 
-				text, err := TranscribeAudio(audioData)
+				text, err := utils.TranscribeAudio(audioData)
 				if err != nil {
 					client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
 						Conversation: proto.String("Failed to transcribe voice message"),
@@ -62,10 +62,10 @@ func init() {
 			Content: prompt,
 		})
 
-		resp, err := OpenAIClient.CreateChatCompletion(
+		resp, err := utils.OpenAIClient.CreateChatCompletion(
 			context.Background(),
 			openai.ChatCompletionRequest{
-				Model: openai.GPT3Dot5Turbo,
+				Model:    openai.GPT3Dot5Turbo,
 				Messages: PastMessages,
 			},
 		)

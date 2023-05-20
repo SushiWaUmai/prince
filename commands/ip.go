@@ -13,15 +13,20 @@ import (
 )
 
 func init() {
-	createCommand("ip", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) error {
-		if len(args) <= 0 {
+	createCommand("ip", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe string, args []string) error {
+		if pipe == "" && len(args) <= 0 {
 			client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
 				Conversation: proto.String("Please specify a url"),
 			})
 			return errors.New("No url provided")
 		}
 
-		url := args[0]
+		var url string
+		if pipe != "" {
+			url = pipe
+		} else {
+			url = args[0]
+		}
 
 		ips, err := net.LookupIP(url)
 		if err != nil {

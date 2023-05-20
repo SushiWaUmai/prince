@@ -20,18 +20,8 @@ import (
 func init() {
 	rxStrict := xurls.Strict()
 
-	createCommand("download", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) error {
-		var text string
-
-		if ctx != nil && ctx.QuotedMessage != nil {
-			if ctx.QuotedMessage.Conversation != nil {
-				text = *ctx.QuotedMessage.Conversation + " "
-			}
-
-			if ctx.QuotedMessage.ExtendedTextMessage != nil && ctx.QuotedMessage.ExtendedTextMessage.Text != nil {
-				text = *ctx.QuotedMessage.ExtendedTextMessage.Text + " "
-			}
-		}
+	createCommand("download", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe string, args []string) error {
+		var text = pipe + " "
 
 		text += strings.Join(args, " ")
 

@@ -16,15 +16,20 @@ import (
 var ipClient = ipinfo.NewClient(nil, nil, "")
 
 func init() {
-	createCommand("ipinfo", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) error {
-		if len(args) <= 0 {
+	createCommand("ipinfo", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe string, args []string) error {
+		if pipe == "" && len(args) <= 0 {
 			client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
 				Conversation: proto.String("Please specify a ip address"),
 			})
 			return errors.New("No ip address specified")
 		}
 
-		ipAddress := args[0]
+		var ipAddress string
+		if pipe != "" {
+			ipAddress = pipe
+		} else {
+			ipAddress = args[0]
+		}
 
 		if !IsIPv4(ipAddress) || !IsIPv6(ipAddress) {
 			ips, err := net.LookupIP(ipAddress)

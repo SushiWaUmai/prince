@@ -48,7 +48,7 @@ var nsfwAnimeCategories = []string{
 }
 
 func init() {
-	createCommand("waifu", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) error {
+	createCommand("waifu", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe string, args []string) error {
 		category := "waifu"
 
 		// Check for arguments

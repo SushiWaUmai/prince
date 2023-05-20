@@ -1,14 +1,10 @@
 package commands
 
 import (
-	"bytes"
 	"context"
 	"errors"
-	"io"
-	"os"
 
-	openai "github.com/sashabaranov/go-openai"
-	ffmpeg "github.com/u2takey/ffmpeg-go"
+	"github.com/SushiWaUmai/prince/utils"
 	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
 	"go.mau.fi/whatsmeow/types/events"
@@ -16,7 +12,7 @@ import (
 )
 
 func init() {
-	createCommand("transcribe", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) error {
+	createCommand("transcribe", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe string, args []string) error {
 		// Check if there's a voice message quoted
 		if ctx == nil || ctx.QuotedMessage == nil || ctx.QuotedMessage.AudioMessage == nil {
 			client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
@@ -35,7 +31,7 @@ func init() {
 		}
 
 		// Use a Golang library to transcribe the audio to text
-		transcription, err := TranscribeAudio(audioData)
+		transcription, err := utils.TranscribeAudio(audioData)
 		if err != nil {
 			client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
 				Conversation: proto.String("Failed to transcribe the audio file"),
@@ -54,65 +50,4 @@ func init() {
 
 		return nil
 	})
-}
-
-func TranscribeAudio(audioData []byte) (string, error) {
-	audioData, err := oggToMp3(audioData)
-	if err != nil {
-		return "", err
-	}
-
-	tmpFile, err := os.CreateTemp("", "audio*.mp3")
-	if err != nil {
-		return "", err
-	}
-	defer os.Remove(tmpFile.Name())
-
-	_, err = io.Copy(tmpFile, bytes.NewReader(audioData))
-	if err != nil {
-		return "", err
-	}
-
-	req, err := OpenAIClient.CreateTranscription(
-		context.Background(),
-		openai.AudioRequest{
-			Model:    openai.Whisper1,
-			FilePath: tmpFile.Name(),
-		},
-	)
-	if err != nil {
-		return "", err
-	}
-
-	return req.Text, nil
-}
-
-func oggToMp3(audioData []byte) ([]byte, error) {
-	// ffmpeg -i $inFileName -acodec libmp3lame -y $outFileName
-	tmpFile, err := os.CreateTemp("", "audio*.ogg")
-	if err != nil {
-		return nil, err
-	}
-	defer os.Remove(tmpFile.Name())
-
-	_, err = io.Copy(tmpFile, bytes.NewReader(audioData))
-	if err != nil {
-		return nil, err
-	}
-
-	tmpFileOut, err := os.CreateTemp("", "audio*.mp3")
-	if err != nil {
-		return nil, err
-	}
-	defer os.Remove(tmpFileOut.Name())
-
-	err = ffmpeg.Input(tmpFile.Name()).Output(tmpFileOut.Name(), ffmpeg.KwArgs{
-		"acodec": "libmp3lame",
-	}).OverWriteOutput().Run()
-
-	if err != nil {
-		return nil, err
-	}
-
-	return os.ReadFile(tmpFileOut.Name())
 }

@@ -48,7 +48,19 @@ func (client *PrinceClient) handleMessage(e *events.Message) {
 				},
 			})
 
-			err := cmd.Execute(client.wac, e, ctx, cmdArgs)
+			var pipe = ""
+
+			if ctx != nil && ctx.QuotedMessage != nil {
+				if ctx.QuotedMessage.Conversation != nil {
+					pipe = *ctx.QuotedMessage.Conversation
+				}
+
+				if ctx.QuotedMessage.ExtendedTextMessage != nil && ctx.QuotedMessage.ExtendedTextMessage.Text != nil {
+					pipe = *ctx.QuotedMessage.ExtendedTextMessage.Text
+				}
+			}
+
+			err := cmd.Execute(client.wac, e, ctx, pipe, cmdArgs)
 
 			var reaction string
 

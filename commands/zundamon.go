@@ -18,11 +18,11 @@ func init() {
 	voicevox := voicevox.NewClient("http", fmt.Sprintf("%s:50021", env.VOICEVOX_ENDPOINT))
 	zundamonIdx := 1
 
-	createCommand("zundamon", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) error {
+	createCommand("zundamon", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe string, args []string) error {
 		var text string
 
-		if ctx != nil && ctx.QuotedMessage != nil && ctx.QuotedMessage.Conversation != nil {
-			text = *ctx.QuotedMessage.Conversation
+		if pipe != "" {
+			text = pipe
 		} else {
 			if len(args) <= 0 {
 				client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{

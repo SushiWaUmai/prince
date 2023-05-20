@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	createCommand("ping", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, args []string) error {
+	createCommand("ping", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe string, args []string) error {
 		reply := "pong!"
 		if len(args) > 0 {
 			reply = args[0]
