@@ -8,6 +8,11 @@ import (
 
 var CommandMap map[string]Command = make(map[string]Command)
 
+type CommandInput struct {
+	Name string
+	Args []string
+}
+
 type Command struct {
 	Name    string
 	Execute func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error)

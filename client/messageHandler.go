@@ -26,18 +26,34 @@ func (client *PrinceClient) handleMessage(e *events.Message) {
 	}
 
 	content = content[len(client.commandPrefix):]
+  content = strings.TrimSpace(content)
 
-	// split the command name with the arguments
-	split := strings.SplitN(content, " ", -1)
-	cmdName := strings.ToLower(split[0])
-	cmdArgs := split[1:]
-
-	cmd, ok := commands.CommandMap[cmdName]
-	if !ok {
-		return
+	commandsSplit := strings.Split(content, "|")
+	commandInput := make([]commands.CommandInput, len(commandsSplit))
+	for i, c := range commandsSplit {
+		// split the command name with the arguments
+		c = strings.TrimSpace(c)
+		split := strings.Split(c, " ")
+		commandInput[i] = commands.CommandInput{
+			Name: strings.ToLower(split[0]),
+			Args: split[1:],
+		}
 	}
 
-	log.Println("Runnning commmand", cmdName, "with args", cmdArgs)
+	// Validate all commands
+	for _, c := range commandInput {
+		_, ok := commands.CommandMap[c.Name]
+		if !ok {
+			log.Println("Command not found: ", c.Name)
+			return
+		}
+	}
+
+	var pipe *waProto.Message = nil
+	if ctx != nil {
+		pipe = ctx.QuotedMessage
+	}
+
 	reaction := "⏳"
 
 	client.wac.SendMessage(context.Background(), e.Info.Chat, &waProto.Message{
@@ -52,17 +68,18 @@ func (client *PrinceClient) handleMessage(e *events.Message) {
 		},
 	})
 
-	var pipe *waProto.Message = nil
-	if ctx != nil {
-		pipe = ctx.QuotedMessage
-	}
-	msg, err := cmd.Execute(client.wac, e, ctx, pipe, cmdArgs)
+	var err error
+	for _, c := range commandInput {
+		log.Println("Runnning commmand", c.Name, "with args", c.Args)
+		pipe, err = commands.CommandMap[c.Name].Execute(client.wac, e, ctx, pipe, c.Args)
 
-	if err == nil {
-		reaction = "👍"
-	} else {
-		log.Println(err)
-		reaction = "❌"
+		if err == nil {
+			reaction = "👍"
+		} else {
+			log.Println(err)
+			reaction = "❌"
+			break
+		}
 	}
 
 	client.wac.SendMessage(context.Background(), e.Info.Chat, &waProto.Message{
@@ -77,8 +94,8 @@ func (client *PrinceClient) handleMessage(e *events.Message) {
 		},
 	})
 
-	if msg != nil {
-		client.wac.SendMessage(context.Background(), e.Info.Chat, msg)
+	if pipe != nil {
+		client.wac.SendMessage(context.Background(), e.Info.Chat, pipe)
 	}
 
 	log.Println("Done.")

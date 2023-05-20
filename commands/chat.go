@@ -10,7 +10,6 @@ import (
 	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
 	"go.mau.fi/whatsmeow/types/events"
-	"google.golang.org/protobuf/proto"
 )
 
 // TODO: Move this to database
@@ -23,27 +22,6 @@ func init() {
 		pipeString, _ := GetTextContext(pipe)
 		if pipeString != "" {
 			prompt = pipeString + "\n\n"
-		}
-
-		if pipe != nil && pipe.AudioMessage != nil {
-			// Download the voice message
-			audioData, err := client.Download(pipe.AudioMessage)
-			if err != nil {
-				client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
-					Conversation: proto.String("Failed to download voice message"),
-				})
-				return nil, err
-			}
-
-			text, err := utils.TranscribeAudio(audioData)
-			if err != nil {
-				client.SendMessage(context.Background(), messageEvent.Info.Chat, &waProto.Message{
-					Conversation: proto.String("Failed to transcribe voice message"),
-				})
-				return nil, err
-			}
-
-			prompt = text + "\n\n"
 		}
 
 		if len(args) > 0 {
