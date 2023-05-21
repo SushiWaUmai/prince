@@ -30,7 +30,7 @@ func Txt2Img(prompt string) ([]byte, error) {
 
 	payload := Txt2ImgRequest{
 		Prompt:         prompt,
-		NegativePrompt: "worst quality, bad quality, normal quality",
+		NegativePrompt: "worst quality, bad quality, normal quality, watermarks, image artifacts",
 		Steps:          35,
 		Width:          512,
 		Height:         512,
