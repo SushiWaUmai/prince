@@ -1,4 +1,4 @@
-package commands
+package mediacmds
 
 import (
 	"bytes"
@@ -12,6 +12,7 @@ import (
 
 	"github.com/SushiWaUmai/prince/utils"
 	"github.com/chai2010/webp"
+	"github.com/disintegration/imaging"
 	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
 	"go.mau.fi/whatsmeow/types/events"
@@ -19,7 +20,7 @@ import (
 )
 
 func init() {
-	utils.CreateCommand("sticker", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
+	utils.CreateCommand("invert", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		if pipe == nil || pipe.ImageMessage == nil {
 			response := &waProto.Message{
 				Conversation: proto.String("Please reply to a image message"),
@@ -43,6 +44,7 @@ func init() {
 		width := uint32(g.Dx())
 		height := uint32(g.Dy())
 
+		img = imaging.Invert(img)
 		webpByte, err := webp.EncodeRGBA(img, *proto.Float32(1))
 		if err != nil {
 			return nil, err
@@ -53,7 +55,7 @@ func init() {
 			return nil, err
 		}
 
-		stickerMsg := &waProto.StickerMessage{
+		invertedImgMsg := &waProto.ImageMessage{
 			Mimetype:      proto.String(http.DetectContentType(webpByte)),
 			Url:           &uploadResp.URL,
 			DirectPath:    &uploadResp.DirectPath,
@@ -61,13 +63,12 @@ func init() {
 			FileEncSha256: uploadResp.FileEncSHA256,
 			FileSha256:    uploadResp.FileSHA256,
 			FileLength:    &uploadResp.FileLength,
-			PngThumbnail:  webpByte,
 			Width:         &width,
 			Height:        &height,
 		}
 
 		response := &waProto.Message{
-			StickerMessage: stickerMsg,
+			ImageMessage: invertedImgMsg,
 		}
 		return response, nil
 	})

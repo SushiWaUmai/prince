@@ -1,4 +1,4 @@
-package commands
+package textcmds
 
 import (
 	"github.com/SushiWaUmai/prince/utils"

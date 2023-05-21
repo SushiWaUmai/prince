@@ -1,4 +1,4 @@
-package commands
+package utilcmds
 
 import (
 	"github.com/SushiWaUmai/prince/utils"
