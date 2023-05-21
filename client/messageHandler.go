@@ -136,13 +136,13 @@ func (client *PrinceClient) sendRepeatedMessages() {
 
 		// Update next date
 		switch msg.Repeat {
-		case "y":
+		case "YEARLY":
 			msg.NextDate = msg.NextDate.AddDate(1, 0, 0)
-		case "m":
+		case "MONTHLY":
 			msg.NextDate = msg.NextDate.AddDate(0, 1, 0)
-		case "w":
+		case "WEEKLY":
 			msg.NextDate = msg.NextDate.AddDate(0, 0, 7)
-		case "d":
+		case "DAILY":
 			msg.NextDate = msg.NextDate.AddDate(0, 0, 1)
 		}
 

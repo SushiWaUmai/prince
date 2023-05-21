@@ -18,7 +18,7 @@ import (
 func init() {
 	utils.CreateCommand("repeat", "USER", func(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		// 1. arg: start date xx.xx.xxxx
-		// 2. arg: repeat "Yearly","Monthly","Weekly","Daily"
+		// 2. arg: repeat "YEARLY","MONTHLY","WEEKLY","DAILY"
 		// 3-n. arg: message
 		// TODO: use pipe
 		if len(args) < 3 {
@@ -38,10 +38,10 @@ func init() {
 		}
 
 		// Get the repeat
-		repeat := args[1]
-		if (repeat != "y") && (repeat != "m") && (repeat != "w") && (repeat != "d") {
+		repeat := strings.ToUpper(args[1])
+		if (repeat != "YEARLY") && (repeat != "MONTHLY") && (repeat != "WEEKLY") && (repeat != "DAILY") {
 			response := &waProto.Message{
-				Conversation: proto.String("Error parsing repeat. Please use one of 'y', 'm', 'w' or 'd'"),
+				Conversation: proto.String("Error parsing repeat. Please use one of 'YEARLY', 'MONTHLY', 'WEEKLY' or 'DAILY'"),
 			}
 			return response, errors.New("Could not parse repeat")
 		}
