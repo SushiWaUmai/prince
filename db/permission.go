@@ -28,9 +28,8 @@ func UpsertPermission(userId string, permission string) UserPermission {
 	return userPerm
 }
 
-func ComparePermission(user string, command string) bool {
+func ComparePermission(perm string, command string) bool {
 	// NONE, USER, ADMIN, OP
-	perm := GetUserPermission(user).Permission
 	switch perm {
 	case "NONE":
 		return false
