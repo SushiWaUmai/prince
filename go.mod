@@ -24,6 +24,7 @@ require (
 	filippo.io/edwards25519 v1.0.0 // indirect
 	github.com/aethiopicuschan/voicevox v1.0.0 // indirect
 	github.com/aws/aws-sdk-go v1.38.20 // indirect
+	github.com/disintegration/imaging v1.6.2 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hajimehoshi/go-mp3 v0.3.3 // indirect
 	github.com/hajimehoshi/oto/v2 v2.2.0 // indirect
@@ -35,6 +36,7 @@ require (
 	github.com/u2takey/go-utils v0.3.1 // indirect
 	go.mau.fi/libsignal v0.1.0 // indirect
 	golang.org/x/crypto v0.6.0 // indirect
+	golang.org/x/image v0.7.0 // indirect
 	golang.org/x/net v0.8.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/sys v0.6.0 // indirect
