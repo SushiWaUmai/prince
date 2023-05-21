@@ -19,12 +19,12 @@ func init() {
 	voicevox := voicevox.NewClient("http", fmt.Sprintf("%s:50021", env.VOICEVOX_ENDPOINT))
 	zundamonIdx := 1
 
-	createCommand("zundamon", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
+	utils.CreateCommand("zundamon", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		var text string
 		if len(args) > 0 {
 			text = strings.Join(args, " ")
 		} else {
-			text, _ = GetTextContext(pipe)
+			text, _ = utils.GetTextContext(pipe)
 		}
 		text = strings.TrimSpace(text)
 

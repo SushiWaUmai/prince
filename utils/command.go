@@ -1,4 +1,4 @@
-package commands
+package utils
 
 import (
 	"go.mau.fi/whatsmeow"
@@ -18,7 +18,7 @@ type Command struct {
 	Execute func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error)
 }
 
-func createCommand(name string, execute func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error)) {
+func CreateCommand(name string, execute func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error)) {
 	CommandMap[name] = Command{
 		Name:    name,
 		Execute: execute,

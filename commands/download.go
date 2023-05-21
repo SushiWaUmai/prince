@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/SushiWaUmai/prince/utils"
 	"github.com/wader/goutubedl"
 	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
@@ -20,8 +21,8 @@ import (
 func init() {
 	rxStrict := xurls.Strict()
 
-	createCommand("download", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
-		text, _ := GetTextContext(pipe)
+	utils.CreateCommand("download", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
+		text, _ := utils.GetTextContext(pipe)
 		text += " "
 
 		text += strings.Join(args, " ")

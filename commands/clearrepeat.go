@@ -9,10 +9,11 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	"github.com/SushiWaUmai/prince/db"
+	"github.com/SushiWaUmai/prince/utils"
 )
 
 func init() {
-	createCommand("clearrepeat", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
+	utils.CreateCommand("clearrepeat", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		// Delete the message
 		affected := db.ClearRepeatedMessage(messageEvent.Info.Chat.String())
 

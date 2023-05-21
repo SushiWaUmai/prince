@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SushiWaUmai/prince/commands"
 	"github.com/SushiWaUmai/prince/db"
+	"github.com/SushiWaUmai/prince/utils"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
 	"go.mau.fi/whatsmeow/types"
 	"go.mau.fi/whatsmeow/types/events"
@@ -19,22 +19,22 @@ func (client *PrinceClient) handleMessage(e *events.Message) {
 		return
 	}
 
-	content, ctx := commands.GetTextContext(e.Message)
+	content, ctx := utils.GetTextContext(e.Message)
 
 	if !strings.HasPrefix(content, client.commandPrefix) {
 		return
 	}
 
 	content = content[len(client.commandPrefix):]
-  content = strings.TrimSpace(content)
+	content = strings.TrimSpace(content)
 
 	commandsSplit := strings.Split(content, "|")
-	commandInput := make([]commands.CommandInput, len(commandsSplit))
+	commandInput := make([]utils.CommandInput, len(commandsSplit))
 	for i, c := range commandsSplit {
 		// split the command name with the arguments
 		c = strings.TrimSpace(c)
 		split := strings.Split(c, " ")
-		commandInput[i] = commands.CommandInput{
+		commandInput[i] = utils.CommandInput{
 			Name: strings.ToLower(split[0]),
 			Args: split[1:],
 		}
@@ -42,7 +42,7 @@ func (client *PrinceClient) handleMessage(e *events.Message) {
 
 	// Validate all commands
 	for _, c := range commandInput {
-		_, ok := commands.CommandMap[c.Name]
+		_, ok := utils.CommandMap[c.Name]
 		if !ok {
 			log.Println("Command not found: ", c.Name)
 			return
@@ -71,7 +71,7 @@ func (client *PrinceClient) handleMessage(e *events.Message) {
 	var err error
 	for _, c := range commandInput {
 		log.Println("Runnning commmand", c.Name, "with args", c.Args)
-		pipe, err = commands.CommandMap[c.Name].Execute(client.wac, e, ctx, pipe, c.Args)
+		pipe, err = utils.CommandMap[c.Name].Execute(client.wac, e, ctx, pipe, c.Args)
 
 		if err == nil {
 			reaction = "👍"

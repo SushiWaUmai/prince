@@ -16,10 +16,10 @@ import (
 var PastMessages = make([]openai.ChatCompletionMessage, 0)
 
 func init() {
-	createCommand("chat", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
+	utils.CreateCommand("chat", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		var prompt string
 
-		pipeString, _ := GetTextContext(pipe)
+		pipeString, _ := utils.GetTextContext(pipe)
 		if pipeString != "" {
 			prompt = pipeString + "\n\n"
 		}

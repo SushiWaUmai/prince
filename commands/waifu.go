@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/SushiWaUmai/prince/utils"
 	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
 	"go.mau.fi/whatsmeow/types/events"
@@ -48,7 +49,7 @@ var nsfwAnimeCategories = []string{
 }
 
 func init() {
-	createCommand("waifu", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
+	utils.CreateCommand("waifu", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		category := "waifu"
 
 		// Check for arguments

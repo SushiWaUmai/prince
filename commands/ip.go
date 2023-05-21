@@ -5,6 +5,7 @@ import (
 	"net"
 	"strings"
 
+	"github.com/SushiWaUmai/prince/utils"
 	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
 	"go.mau.fi/whatsmeow/types/events"
@@ -12,8 +13,8 @@ import (
 )
 
 func init() {
-	createCommand("ip", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
-		pipeString, _ := GetTextContext(pipe)
+	utils.CreateCommand("ip", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
+		pipeString, _ := utils.GetTextContext(pipe)
 		if pipeString == "" && len(args) <= 0 {
 			response := &waProto.Message{
 				Conversation: proto.String("Please specify a url"),

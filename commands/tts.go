@@ -17,12 +17,12 @@ import (
 )
 
 func init() {
-	createCommand("tts", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
+	utils.CreateCommand("tts", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		var text string
 		if len(args) > 0 {
 			text = strings.Join(args, " ")
 		} else {
-			text, _ = GetTextContext(pipe)
+			text, _ = utils.GetTextContext(pipe)
 		}
 		text = strings.TrimSpace(text)
 

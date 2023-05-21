@@ -12,10 +12,11 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	"github.com/SushiWaUmai/prince/db"
+	"github.com/SushiWaUmai/prince/utils"
 )
 
 func init() {
-	createCommand("repeat", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
+	utils.CreateCommand("repeat", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		// 1. arg: start date xx.xx.xxxx
 		// 2. arg: repeat "Yearly","Monthly","Weekly","Daily"
 		// 3-n. arg: message

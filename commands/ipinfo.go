@@ -5,6 +5,7 @@ import (
 	"net"
 	"strings"
 
+	"github.com/SushiWaUmai/prince/utils"
 	"github.com/ipinfo/go/v2/ipinfo"
 	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
@@ -15,8 +16,8 @@ import (
 var ipClient = ipinfo.NewClient(nil, nil, "")
 
 func init() {
-	createCommand("ipinfo", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
-		pipeString, _ := GetTextContext(pipe)
+	utils.CreateCommand("ipinfo", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
+		pipeString, _ := utils.GetTextContext(pipe)
 		if pipeString == "" && len(args) <= 0 {
 			response := &waProto.Message{
 				Conversation: proto.String("Please specify a ip address"),

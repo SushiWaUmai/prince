@@ -10,6 +10,7 @@ import (
 	_ "image/png"
 	"net/http"
 
+	"github.com/SushiWaUmai/prince/utils"
 	"github.com/chai2010/webp"
 	"github.com/disintegration/imaging"
 	"go.mau.fi/whatsmeow"
@@ -19,7 +20,7 @@ import (
 )
 
 func init() {
-	createCommand("invert", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
+	utils.CreateCommand("invert", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		if pipe == nil || pipe.ImageMessage == nil {
 			response := &waProto.Message{
 				Conversation: proto.String("Please reply to a image message"),
