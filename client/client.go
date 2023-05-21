@@ -78,15 +78,14 @@ func (client *PrinceClient) SendMessage(chat types.JID, msg *waProto.Message) (r
 	return client.wac.SendMessage(context.Background(), chat, msg)
 }
 
-func (client *PrinceClient) SendCommandMessage(chat types.JID, msg *waProto.Message) (resp whatsmeow.SendResponse, err error) {
-  resp, err = client.SendMessage(chat, msg)
-  if err != nil {
-    return resp, err
-  }
+func (client *PrinceClient) SendCommandMessage(chat types.JID, user string, msg *waProto.Message) (resp whatsmeow.SendResponse, err error) {
+	resp, err = client.SendMessage(chat, msg)
+	if err != nil {
+		return resp, err
+	}
 
-  client.handleCommand(msg, resp.ID, chat)
-
-  return resp, err
+	client.handleCommand(msg, resp.ID, chat, user)
+	return resp, err
 }
 
 func (client *PrinceClient) register() {

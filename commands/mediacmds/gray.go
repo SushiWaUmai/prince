@@ -6,5 +6,5 @@ import (
 )
 
 func init() {
-	utils.CreateCommand("gray", utils.CreateImgCmd(imaging.Grayscale))
+	utils.CreateCommand("gray", "USER", utils.CreateImgCmd(imaging.Grayscale))
 }

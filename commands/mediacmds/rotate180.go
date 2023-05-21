@@ -6,5 +6,5 @@ import (
 )
 
 func init() {
-	utils.CreateCommand("rotate180", utils.CreateImgCmd(imaging.Rotate180))
+	utils.CreateCommand("rotate180", "USER", utils.CreateImgCmd(imaging.Rotate180))
 }

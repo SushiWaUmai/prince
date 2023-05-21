@@ -26,7 +26,7 @@ func init() {
 	voicevox := voicevox.NewClient(url.Scheme, url.Host)
 	zundamonIdx := 1
 
-	utils.CreateCommand("zundamon", func(client *whatsmeow.Client, chat types.JID, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
+	utils.CreateCommand("zundamon", "USER", func(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		var text string
 		if len(args) > 0 {
 			text = strings.Join(args, " ")

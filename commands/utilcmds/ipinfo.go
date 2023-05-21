@@ -16,7 +16,7 @@ import (
 var ipClient = ipinfo.NewClient(nil, nil, "")
 
 func init() {
-	utils.CreateCommand("ipinfo", func(client *whatsmeow.Client, chat types.JID, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
+	utils.CreateCommand("ipinfo", "USER", func(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		pipeString, _ := utils.GetTextContext(pipe)
 		if pipeString == "" && len(args) <= 0 {
 			response := &waProto.Message{

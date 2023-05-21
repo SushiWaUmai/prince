@@ -21,7 +21,7 @@ import (
 func init() {
 	rxStrict := xurls.Strict()
 
-	utils.CreateCommand("download", func(client *whatsmeow.Client, chat types.JID, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
+	utils.CreateCommand("download", "USER", func(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		text, _ := utils.GetTextContext(pipe)
 		text += " "
 

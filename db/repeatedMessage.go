@@ -9,22 +9,24 @@ import (
 type RepeatedMessage struct {
 	gorm.Model
 	JID      string    `gorm:"not null;column:jid"`
+	User     string    `gorm:"not null"`
 	Message  string    `gorm:"not null"`
 	Repeat   string    `gorm:"not null"`
 	NextDate time.Time `gorm:"not null"`
 }
 
-func CreateRepeatedMessage(jid string, message string, repeat string, nextDate time.Time) {
+func CreateRepeatedMessage(jid string, user string, message string, repeat string, nextDate time.Time) {
 	db.Create(&RepeatedMessage{
 		JID:      jid,
+		User:     user,
 		Message:  message,
 		Repeat:   repeat,
 		NextDate: nextDate,
 	})
 }
 
-func ClearRepeatedMessage(jid string) int64 {
-	result := db.Delete(&RepeatedMessage{}, "jid = ?", jid)
+func ClearRepeatedMessage(jid string, user string) int64 {
+	result := db.Where("jid = ? AND user = ?", jid, user).Delete(&RepeatedMessage{})
 	return result.RowsAffected
 }
 

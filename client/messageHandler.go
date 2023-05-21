@@ -18,13 +18,22 @@ func (client *PrinceClient) handleMessage(e *events.Message) {
 		return
 	}
 
-	client.handleCommand(e.Message, e.Info.ID, e.Info.Chat)
+	client.handleCommand(e.Message, e.Info.ID, e.Info.Chat, e.Info.Sender.User)
 }
 
-func (client *PrinceClient) handleCommand(message *waProto.Message, msgId types.MessageID, chat types.JID) {
+func (client *PrinceClient) handleCommand(message *waProto.Message, msgId types.MessageID, chat types.JID, user string) {
 	content, ctx := utils.GetTextContext(message)
 
 	if !strings.HasPrefix(content, client.commandPrefix) {
+		return
+	}
+
+	perm := db.GetUserPermission(user).Permission
+	if client.wac.Store.ID.ToNonAD().User == user {
+		perm = "OP"
+	}
+
+	if perm == "NONE" {
 		return
 	}
 
@@ -45,9 +54,13 @@ func (client *PrinceClient) handleCommand(message *waProto.Message, msgId types.
 
 	// Validate all commands
 	for _, c := range commandInput {
-		_, ok := utils.CommandMap[c.Name]
+		cmd, ok := utils.CommandMap[c.Name]
 		if !ok {
 			log.Println("Command not found: ", c.Name)
+			return
+		}
+		if !db.ComparePermission(perm, cmd.Permission) {
+			log.Println("Not enough permission")
 			return
 		}
 	}
@@ -74,7 +87,7 @@ func (client *PrinceClient) handleCommand(message *waProto.Message, msgId types.
 	var err error
 	for _, c := range commandInput {
 		log.Println("Runnning commmand", c.Name, "with args", c.Args)
-		pipe, err = utils.CommandMap[c.Name].Execute(client.wac, chat, ctx, pipe, c.Args)
+		pipe, err = utils.CommandMap[c.Name].Execute(client.wac, chat, user, ctx, pipe, c.Args)
 
 		if err == nil {
 			reaction = "👍"
@@ -98,7 +111,7 @@ func (client *PrinceClient) handleCommand(message *waProto.Message, msgId types.
 	})
 
 	if pipe != nil {
-		client.SendCommandMessage(chat, pipe)
+		client.SendCommandMessage(chat, user, pipe)
 	}
 
 	log.Println("Done.")
@@ -113,7 +126,7 @@ func (client *PrinceClient) sendRepeatedMessages() {
 			log.Println("Failed to send message:", err)
 			continue
 		}
-		_, err = client.SendMessage(jid, &waProto.Message{
+		_, err = client.SendCommandMessage(jid, msg.User, &waProto.Message{
 			Conversation: proto.String(msg.Message),
 		})
 		if err != nil {

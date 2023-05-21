@@ -11,7 +11,7 @@ import (
 )
 
 func init() {
-	utils.CreateCommand("help", func(client *whatsmeow.Client, chat types.JID, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
+	utils.CreateCommand("help", "USER", func(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		var cmds []string
 
 		for _, c := range utils.CommandMap {

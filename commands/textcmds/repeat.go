@@ -16,7 +16,7 @@ import (
 )
 
 func init() {
-	utils.CreateCommand("repeat", func(client *whatsmeow.Client, chat types.JID, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
+	utils.CreateCommand("repeat", "USER", func(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		// 1. arg: start date xx.xx.xxxx
 		// 2. arg: repeat "Yearly","Monthly","Weekly","Daily"
 		// 3-n. arg: message
@@ -50,7 +50,7 @@ func init() {
 		message := strings.Join(args[2:], " ")
 
 		// Save the message
-		db.CreateRepeatedMessage(chat.String(), message, repeat, date)
+		db.CreateRepeatedMessage(chat.String(), user, message, repeat, date)
 
 		// Reply
 		response := &waProto.Message{

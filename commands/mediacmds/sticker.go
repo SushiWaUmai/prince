@@ -19,7 +19,7 @@ import (
 )
 
 func init() {
-	utils.CreateCommand("sticker", func(client *whatsmeow.Client, chat types.JID, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
+	utils.CreateCommand("sticker", "USER", func(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		if pipe == nil || pipe.ImageMessage == nil {
 			response := &waProto.Message{
 				Conversation: proto.String("Please reply to a image message"),

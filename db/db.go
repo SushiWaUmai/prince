@@ -19,8 +19,12 @@ func init() {
 		log.Panicln("Failed to open database connection:", err)
 	}
 
-	// Migrate the schema
 	err = db.AutoMigrate(&RepeatedMessage{})
+	if err != nil {
+		log.Panicln("Failed to migrate database:", err)
+	}
+
+	err = db.AutoMigrate(&UserPermission{})
 	if err != nil {
 		log.Panicln("Failed to migrate database:", err)
 	}

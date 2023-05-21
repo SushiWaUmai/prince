@@ -10,7 +10,7 @@ import (
 )
 
 func init() {
-	utils.CreateCommand("ping", func(client *whatsmeow.Client, chat types.JID, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
+	utils.CreateCommand("ping", "USER", func(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		reply := "pong!"
 		if len(args) > 0 {
 			reply = strings.Join(args, " ")

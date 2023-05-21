@@ -13,9 +13,9 @@ import (
 )
 
 func init() {
-	utils.CreateCommand("clearrepeat", func(client *whatsmeow.Client, chat types.JID, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
+	utils.CreateCommand("clearrepeat", "ADMIN", func(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		// Delete the message
-		affected := db.ClearRepeatedMessage(chat.String())
+		affected := db.ClearRepeatedMessage(chat.String(), user)
 
 		// Reply
 		response := &waProto.Message{

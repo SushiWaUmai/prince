@@ -15,7 +15,7 @@ import (
 )
 
 func init() {
-	utils.CreateCommand("sd", func(client *whatsmeow.Client, chat types.JID, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
+	utils.CreateCommand("sd", "USER", func(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		var prompt string
 		pipeString, _ := utils.GetTextContext(pipe)
 		if pipeString != "" {

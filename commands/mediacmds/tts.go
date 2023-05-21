@@ -17,7 +17,7 @@ import (
 )
 
 func init() {
-	utils.CreateCommand("tts", func(client *whatsmeow.Client, chat types.JID, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
+	utils.CreateCommand("tts", "USER", func(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		var text string
 		if len(args) > 0 {
 			text = strings.Join(args, " ")

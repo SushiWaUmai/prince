@@ -11,7 +11,7 @@ import (
 )
 
 func init() {
-	utils.CreateCommand("transcribe", func(client *whatsmeow.Client, chat types.JID, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
+	utils.CreateCommand("transcribe", "ADMIN", func(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		// Check if there's a voice message quoted
 		if pipe.AudioMessage == nil {
 			response := &waProto.Message{
