@@ -13,7 +13,7 @@ import (
 	"github.com/wader/goutubedl"
 	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
-	"go.mau.fi/whatsmeow/types/events"
+	"go.mau.fi/whatsmeow/types"
 	"google.golang.org/protobuf/proto"
 	"mvdan.cc/xurls/v2"
 )
@@ -21,7 +21,7 @@ import (
 func init() {
 	rxStrict := xurls.Strict()
 
-	utils.CreateCommand("download", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
+	utils.CreateCommand("download", func(client *whatsmeow.Client, chat types.JID, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		text, _ := utils.GetTextContext(pipe)
 		text += " "
 

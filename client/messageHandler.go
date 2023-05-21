@@ -1,7 +1,6 @@
 package client
 
 import (
-	"context"
 	"log"
 	"strings"
 	"time"
@@ -19,7 +18,11 @@ func (client *PrinceClient) handleMessage(e *events.Message) {
 		return
 	}
 
-	content, ctx := utils.GetTextContext(e.Message)
+	client.handleCommand(e.Message, e.Info.ID, e.Info.Chat)
+}
+
+func (client *PrinceClient) handleCommand(message *waProto.Message, msgId types.MessageID, chat types.JID) {
+	content, ctx := utils.GetTextContext(message)
 
 	if !strings.HasPrefix(content, client.commandPrefix) {
 		return
@@ -56,12 +59,12 @@ func (client *PrinceClient) handleMessage(e *events.Message) {
 
 	reaction := "⏳"
 
-	client.wac.SendMessage(context.Background(), e.Info.Chat, &waProto.Message{
+	client.SendMessage(chat, &waProto.Message{
 		ReactionMessage: &waProto.ReactionMessage{
 			Key: &waProto.MessageKey{
-				RemoteJid: proto.String(e.Info.Chat.String()),
+				RemoteJid: proto.String(chat.String()),
 				FromMe:    proto.Bool(true),
-				Id:        &e.Info.ID,
+				Id:        &msgId,
 			},
 			Text:              &reaction,
 			SenderTimestampMs: proto.Int64(time.Now().UnixMilli()),
@@ -71,7 +74,7 @@ func (client *PrinceClient) handleMessage(e *events.Message) {
 	var err error
 	for _, c := range commandInput {
 		log.Println("Runnning commmand", c.Name, "with args", c.Args)
-		pipe, err = utils.CommandMap[c.Name].Execute(client.wac, e, ctx, pipe, c.Args)
+		pipe, err = utils.CommandMap[c.Name].Execute(client.wac, chat, ctx, pipe, c.Args)
 
 		if err == nil {
 			reaction = "👍"
@@ -82,12 +85,12 @@ func (client *PrinceClient) handleMessage(e *events.Message) {
 		}
 	}
 
-	client.wac.SendMessage(context.Background(), e.Info.Chat, &waProto.Message{
+	client.SendMessage(chat, &waProto.Message{
 		ReactionMessage: &waProto.ReactionMessage{
 			Key: &waProto.MessageKey{
-				RemoteJid: proto.String(e.Info.Chat.String()),
+				RemoteJid: proto.String(chat.String()),
 				FromMe:    proto.Bool(true),
-				Id:        &e.Info.ID,
+				Id:        &msgId,
 			},
 			Text:              &reaction,
 			SenderTimestampMs: proto.Int64(time.Now().UnixMilli()),
@@ -95,7 +98,7 @@ func (client *PrinceClient) handleMessage(e *events.Message) {
 	})
 
 	if pipe != nil {
-		client.wac.SendMessage(context.Background(), e.Info.Chat, pipe)
+		client.SendCommandMessage(chat, pipe)
 	}
 
 	log.Println("Done.")
@@ -105,7 +108,18 @@ func (client *PrinceClient) sendRepeatedMessages() {
 	msgs := db.GetRepeatedMessageToday()
 
 	for _, msg := range msgs {
-		client.sendMessage(msg.JID, msg.Message)
+		jid, err := types.ParseJID(msg.JID)
+		if err != nil {
+			log.Println("Failed to send message:", err)
+			continue
+		}
+		_, err = client.SendMessage(jid, &waProto.Message{
+			Conversation: proto.String(msg.Message),
+		})
+		if err != nil {
+			log.Println("Failed to send message:", err)
+			continue
+		}
 
 		// Update next date
 		switch msg.Repeat {
@@ -123,20 +137,4 @@ func (client *PrinceClient) sendRepeatedMessages() {
 	}
 
 	log.Println("Sent", len(msgs), "repeated messages")
-}
-
-func (client *PrinceClient) sendMessage(jidCode string, messageContent string) {
-	jid, err := types.ParseJID(jidCode)
-	if err != nil {
-		log.Println("Failed to send message:", err)
-		return
-	}
-
-	_, err = client.wac.SendMessage(context.Background(), jid, &waProto.Message{
-		Conversation: proto.String(messageContent),
-	})
-	if err != nil {
-		log.Println("Failed to send message:", err)
-		return
-	}
 }

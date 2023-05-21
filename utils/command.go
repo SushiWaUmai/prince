@@ -3,7 +3,7 @@ package utils
 import (
 	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
-	"go.mau.fi/whatsmeow/types/events"
+	"go.mau.fi/whatsmeow/types"
 )
 
 var CommandMap map[string]Command = make(map[string]Command)
@@ -15,10 +15,10 @@ type CommandInput struct {
 
 type Command struct {
 	Name    string
-	Execute func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error)
+	Execute func(client *whatsmeow.Client, chat types.JID, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error)
 }
 
-func CreateCommand(name string, execute func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error)) {
+func CreateCommand(name string, execute func(client *whatsmeow.Client, chat types.JID, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error)) {
 	CommandMap[name] = Command{
 		Name:    name,
 		Execute: execute,

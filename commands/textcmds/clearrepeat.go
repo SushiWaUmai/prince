@@ -5,7 +5,7 @@ import (
 
 	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
-	"go.mau.fi/whatsmeow/types/events"
+	"go.mau.fi/whatsmeow/types"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/SushiWaUmai/prince/db"
@@ -13,9 +13,9 @@ import (
 )
 
 func init() {
-	utils.CreateCommand("clearrepeat", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
+	utils.CreateCommand("clearrepeat", func(client *whatsmeow.Client, chat types.JID, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		// Delete the message
-		affected := db.ClearRepeatedMessage(messageEvent.Info.Chat.String())
+		affected := db.ClearRepeatedMessage(chat.String())
 
 		// Reply
 		response := &waProto.Message{

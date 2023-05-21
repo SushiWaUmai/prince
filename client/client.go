@@ -8,7 +8,9 @@ import (
 	"github.com/mdp/qrterminal"
 	"github.com/robfig/cron/v3"
 	"go.mau.fi/whatsmeow"
+	waProto "go.mau.fi/whatsmeow/binary/proto"
 	"go.mau.fi/whatsmeow/store"
+	"go.mau.fi/whatsmeow/types"
 	"go.mau.fi/whatsmeow/types/events"
 	waLog "go.mau.fi/whatsmeow/util/log"
 
@@ -70,6 +72,21 @@ func (client *PrinceClient) Disconnect() {
 	log.Println("Stopping Cron Job...")
 	client.cronJob.Stop()
 	client.wac.Disconnect()
+}
+
+func (client *PrinceClient) SendMessage(chat types.JID, msg *waProto.Message) (resp whatsmeow.SendResponse, err error) {
+	return client.wac.SendMessage(context.Background(), chat, msg)
+}
+
+func (client *PrinceClient) SendCommandMessage(chat types.JID, msg *waProto.Message) (resp whatsmeow.SendResponse, err error) {
+  resp, err = client.SendMessage(chat, msg)
+  if err != nil {
+    return resp, err
+  }
+
+  client.handleCommand(msg, resp.ID, chat)
+
+  return resp, err
 }
 
 func (client *PrinceClient) register() {

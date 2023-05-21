@@ -9,14 +9,14 @@ import (
 	openai "github.com/sashabaranov/go-openai"
 	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
-	"go.mau.fi/whatsmeow/types/events"
+	"go.mau.fi/whatsmeow/types"
 )
 
 // TODO: Move this to database
 var PastMessages = make([]openai.ChatCompletionMessage, 0)
 
 func init() {
-	utils.CreateCommand("chat", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
+	utils.CreateCommand("chat", func(client *whatsmeow.Client, chat types.JID, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		var prompt string
 
 		pipeString, _ := utils.GetTextContext(pipe)

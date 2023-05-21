@@ -9,14 +9,14 @@ import (
 	"github.com/ipinfo/go/v2/ipinfo"
 	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
-	"go.mau.fi/whatsmeow/types/events"
+	"go.mau.fi/whatsmeow/types"
 	"google.golang.org/protobuf/proto"
 )
 
 var ipClient = ipinfo.NewClient(nil, nil, "")
 
 func init() {
-	utils.CreateCommand("ipinfo", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
+	utils.CreateCommand("ipinfo", func(client *whatsmeow.Client, chat types.JID, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		pipeString, _ := utils.GetTextContext(pipe)
 		if pipeString == "" && len(args) <= 0 {
 			response := &waProto.Message{

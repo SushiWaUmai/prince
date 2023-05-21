@@ -8,7 +8,7 @@ import (
 
 	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
-	"go.mau.fi/whatsmeow/types/events"
+	"go.mau.fi/whatsmeow/types"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/SushiWaUmai/prince/db"
@@ -16,11 +16,11 @@ import (
 )
 
 func init() {
-	utils.CreateCommand("repeat", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
+	utils.CreateCommand("repeat", func(client *whatsmeow.Client, chat types.JID, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		// 1. arg: start date xx.xx.xxxx
 		// 2. arg: repeat "Yearly","Monthly","Weekly","Daily"
 		// 3-n. arg: message
-    // TODO: use pipe
+		// TODO: use pipe
 		if len(args) < 3 {
 			repsonse := &waProto.Message{
 				Conversation: proto.String("Usage: repeat <start date> <repeat> <message>"),
@@ -50,7 +50,7 @@ func init() {
 		message := strings.Join(args[2:], " ")
 
 		// Save the message
-		db.CreateRepeatedMessage(messageEvent.Info.Chat.String(), message, repeat, date)
+		db.CreateRepeatedMessage(chat.String(), message, repeat, date)
 
 		// Reply
 		response := &waProto.Message{
