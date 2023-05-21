@@ -3,13 +3,10 @@ package mediacmds
 import (
 	"bytes"
 	"context"
-	"encoding/json"
-	"fmt"
 	"image"
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
-	"io/ioutil"
 	"net/http"
 	"strings"
 
@@ -17,15 +14,8 @@ import (
 	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
 	"go.mau.fi/whatsmeow/types/events"
+	"google.golang.org/protobuf/proto"
 )
-
-type animeImage struct {
-	Url string `json:"url"`
-}
-
-type animeResponse struct {
-	Images []animeImage `json:"images"`
-}
 
 var animeCategories = []string{
 	"maid",
@@ -81,27 +71,7 @@ func init() {
 			}
 		}
 
-		resp, err := http.Get(fmt.Sprintf("https://api.waifu.im/search/?included_tags=%s", category))
-		if err != nil {
-			return nil, err
-		}
-		defer resp.Body.Close()
-
-		var data animeResponse
-		err = json.NewDecoder(resp.Body).Decode(&data)
-		if err != nil {
-			return nil, err
-		}
-
-		resp, err = http.Get(data.Images[0].Url)
-		if err != nil {
-			return nil, err
-		}
-		defer resp.Body.Close()
-
-		mimeType := resp.Header.Get("Content-Type")
-
-		buffer, err := ioutil.ReadAll(resp.Body)
+		buffer, err := utils.GetWaifu(category)
 		if err != nil {
 			return nil, err
 		}
@@ -122,7 +92,7 @@ func init() {
 		height := uint32(g.Dy())
 
 		imgMsg := &waProto.ImageMessage{
-			Mimetype:      &mimeType,
+			Mimetype:      proto.String(http.DetectContentType(buffer)),
 			Url:           &uploadResp.URL,
 			DirectPath:    &uploadResp.DirectPath,
 			MediaKey:      uploadResp.MediaKey,
