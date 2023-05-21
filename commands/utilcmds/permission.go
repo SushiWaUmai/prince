@@ -16,7 +16,7 @@ func init() {
 	utils.CreateCommand("permission", "OP", func(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		if len(args) < 1 {
 			response := &waProto.Message{
-				Conversation: proto.String("<permission> <user>"),
+				Conversation: proto.String("Usage: permission <permission> <user>"),
 			}
 			return response, errors.New("Not enough arguments")
 		}
@@ -26,20 +26,25 @@ func init() {
 		// NONE, USER, ADMIN
 		if perm != "NONE" && perm != "USER" && perm != "ADMIN" {
 			response := &waProto.Message{
-				Conversation: proto.String("Invalid permission type"),
+				Conversation: proto.String("Invalid permission type. Available: NONE, USER, ADMIN"),
 			}
 			return response, errors.New("Invalid permission type")
 		}
 
-		if ctx == nil || len(ctx.MentionedJid) <= 0 {
+		isGroup := chat.Server == "g.us"
+		if isGroup && (ctx == nil || len(ctx.MentionedJid) <= 0) {
 			response := &waProto.Message{
 				Conversation: proto.String("No user mentioned"),
 			}
 			return response, errors.New("No user mentioned")
 		}
 
-		for _, u := range ctx.MentionedJid {
-			db.UpsertPermission(u, perm)
+		if isGroup {
+			for _, u := range ctx.MentionedJid {
+				db.UpdateUserPermission(u, perm)
+			}
+		} else {
+			db.UpdateUserPermission(chat.String(), perm)
 		}
 
 		response := &waProto.Message{

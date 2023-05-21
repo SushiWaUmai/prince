@@ -4,8 +4,8 @@ import "gorm.io/gorm"
 
 type UserPermission struct {
 	gorm.Model
-	UserID     string `gorm:"not null;unique"`
-	Permission string `gorm:"not null"`
+	UserID     string `gorm:"not null;unique;column:user_id"`
+	Permission string `gorm:"not null;column:permission"`
 }
 
 func GetUserPermission(userId string) UserPermission {
@@ -19,13 +19,8 @@ func GetUserPermission(userId string) UserPermission {
 	return userPerm
 }
 
-func UpsertPermission(userId string, permission string) UserPermission {
-	userPerm := UserPermission{
-		UserID:     userId,
-		Permission: permission,
-	}
-	db.Save(&userPerm)
-	return userPerm
+func UpdateUserPermission(userId string, permission string) {
+	db.Model(&UserPermission{}).Where("user_id = ?", userId).Update("permission", permission)
 }
 
 func ComparePermission(perm string, command string) bool {
