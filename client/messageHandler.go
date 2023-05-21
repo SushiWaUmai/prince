@@ -14,10 +14,6 @@ import (
 )
 
 func (client *PrinceClient) handleMessage(e *events.Message) {
-	if !e.Info.IsFromMe {
-		return
-	}
-
 	client.handleCommand(e.Message, e.Info.ID, e.Info.Chat, e.Info.Sender.User)
 }
 
