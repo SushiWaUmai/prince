@@ -41,10 +41,15 @@ func init() {
 
 		if isGroup {
 			for _, u := range ctx.MentionedJid {
-				db.UpdateUserPermission(u, perm)
+				jid, err := types.ParseJID(u)
+				if err != nil {
+					return nil, errors.New("Failed to parse JID")
+				}
+
+				db.UpdateUserPermission(jid.ToNonAD().User, perm)
 			}
 		} else {
-			db.UpdateUserPermission(chat.String(), perm)
+			db.UpdateUserPermission(chat.ToNonAD().User, perm)
 		}
 
 		response := &waProto.Message{
