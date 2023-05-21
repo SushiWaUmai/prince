@@ -6,5 +6,5 @@ import (
 )
 
 func init() {
-	utils.CreateCommand("invert", utils.CreateImgCmd(imaging.Invert))
+	utils.CreateCommand("fliph", utils.CreateImgCmd(imaging.FlipH))
 }
