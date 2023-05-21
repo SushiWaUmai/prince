@@ -3,7 +3,8 @@ package mediacmds
 import (
 	"context"
 	"errors"
-	"fmt"
+	"log"
+	"net/url"
 	"strings"
 
 	"github.com/SushiWaUmai/prince/env"
@@ -16,7 +17,13 @@ import (
 )
 
 func init() {
-	voicevox := voicevox.NewClient("http", fmt.Sprintf("%s:50021", env.VOICEVOX_ENDPOINT))
+	// TODO: Move this to utils
+	url, err := url.Parse(env.VOICEVOX_ENDPOINT)
+	if err != nil {
+		log.Println("Failed to register zundamon command:", err)
+	}
+
+	voicevox := voicevox.NewClient(url.Scheme, url.Host)
 	zundamonIdx := 1
 
 	utils.CreateCommand("zundamon", func(client *whatsmeow.Client, messageEvent *events.Message, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
