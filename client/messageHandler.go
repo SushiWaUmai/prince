@@ -25,7 +25,8 @@ func (client *PrinceClient) handleCommand(message *waProto.Message, msgId types.
 	}
 
 	perm := db.GetUserPermission(user).Permission
-	if client.wac.Store.ID.ToNonAD().User == user {
+	fromMe := client.wac.Store.ID.ToNonAD().User == user
+	if fromMe {
 		perm = "OP"
 	}
 
@@ -72,7 +73,7 @@ func (client *PrinceClient) handleCommand(message *waProto.Message, msgId types.
 		ReactionMessage: &waProto.ReactionMessage{
 			Key: &waProto.MessageKey{
 				RemoteJid: proto.String(chat.String()),
-				FromMe:    proto.Bool(true),
+				FromMe:    &fromMe,
 				Id:        &msgId,
 			},
 			Text:              &reaction,
@@ -98,7 +99,7 @@ func (client *PrinceClient) handleCommand(message *waProto.Message, msgId types.
 		ReactionMessage: &waProto.ReactionMessage{
 			Key: &waProto.MessageKey{
 				RemoteJid: proto.String(chat.String()),
-				FromMe:    proto.Bool(true),
+				FromMe:    &fromMe,
 				Id:        &msgId,
 			},
 			Text:              &reaction,
