@@ -19,17 +19,17 @@ import (
 )
 
 func init() {
-	utils.CreateCommand("sticker", "USER", func(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
-		if pipe == nil || pipe.ImageMessage == nil {
+	utils.CreateCommand("toimage", "USER", func(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
+		if pipe == nil || pipe.StickerMessage == nil {
 			response := &waProto.Message{
-				Conversation: proto.String("Please reply to a image message"),
+				Conversation: proto.String("Please reply to a sticker message"),
 			}
-			return response, errors.New("No ImageMessage quoted")
+			return response, errors.New("No StickerMessage quoted")
 		}
-		imgMsg := pipe.ImageMessage
+		stickerImg := pipe.StickerMessage
 
-		buffer, err := client.Download(imgMsg)
-		if err != nil {
+		buffer, err := client.Download(stickerImg)
+		if buffer == nil {
 			return nil, err
 		}
 
@@ -53,7 +53,7 @@ func init() {
 			return nil, err
 		}
 
-		stickerMsg := &waProto.StickerMessage{
+		imgMsg := &waProto.ImageMessage{
 			Mimetype:      proto.String(http.DetectContentType(webpByte)),
 			Url:           &uploadResp.URL,
 			DirectPath:    &uploadResp.DirectPath,
@@ -61,13 +61,12 @@ func init() {
 			FileEncSha256: uploadResp.FileEncSHA256,
 			FileSha256:    uploadResp.FileSHA256,
 			FileLength:    &uploadResp.FileLength,
-			PngThumbnail:  webpByte,
 			Width:         &width,
 			Height:        &height,
 		}
 
 		response := &waProto.Message{
-			StickerMessage: stickerMsg,
+			ImageMessage: imgMsg,
 		}
 		return response, nil
 	})
