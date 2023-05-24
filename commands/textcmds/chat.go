@@ -13,7 +13,7 @@ import (
 )
 
 // TODO: Move this to database
-var PastMessages = make([]openai.ChatCompletionMessage, 0)
+var PastMessages = make(map[types.JID][]openai.ChatCompletionMessage, 0)
 
 func init() {
 	utils.CreateCommand("chat", "ADMIN", func(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
@@ -34,7 +34,7 @@ func init() {
 			return nil, errors.New("Failed to generate openai response, no prompt was provided")
 		}
 
-		PastMessages = append(PastMessages, openai.ChatCompletionMessage{
+		PastMessages[chat] = append(PastMessages[chat], openai.ChatCompletionMessage{
 			Role:    openai.ChatMessageRoleUser,
 			Content: prompt,
 		})
@@ -43,7 +43,7 @@ func init() {
 			context.Background(),
 			openai.ChatCompletionRequest{
 				Model:    openai.GPT3Dot5Turbo,
-				Messages: PastMessages,
+				Messages: PastMessages[chat],
 			},
 		)
 
@@ -53,7 +53,7 @@ func init() {
 
 		reply := resp.Choices[0].Message.Content
 
-		PastMessages = append(PastMessages, openai.ChatCompletionMessage{
+		PastMessages[chat] = append(PastMessages[chat], openai.ChatCompletionMessage{
 			Role:    openai.ChatMessageRoleAssistant,
 			Content: reply,
 		})
