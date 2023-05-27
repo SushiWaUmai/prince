@@ -57,6 +57,9 @@ func Txt2Img(prompt string) ([]byte, error) {
 
 	res := Txt2ImgResponse{}
 	err = json.Unmarshal(body, &res)
+	if err != nil {
+		return nil, err
+	}
 
 	imgData, err := base64.StdEncoding.DecodeString(res.Images[0])
 	if err != nil {

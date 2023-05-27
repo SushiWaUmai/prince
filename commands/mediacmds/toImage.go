@@ -2,13 +2,11 @@ package mediacmds
 
 import (
 	"bytes"
-	"context"
 	"errors"
 	"image"
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
-	"net/http"
 
 	"github.com/SushiWaUmai/prince/utils"
 	"github.com/chai2010/webp"
@@ -37,32 +35,15 @@ func init() {
 		if err != nil {
 			return nil, err
 		}
-		g := img.Bounds()
-
-		// Get height and width
-		width := uint32(g.Dx())
-		height := uint32(g.Dy())
 
 		webpByte, err := webp.EncodeRGBA(img, *proto.Float32(1))
 		if err != nil {
 			return nil, err
 		}
 
-		uploadResp, err := client.Upload(context.Background(), webpByte, whatsmeow.MediaImage)
+		imgMsg, err := utils.CreateImgMessage(client, webpByte)
 		if err != nil {
 			return nil, err
-		}
-
-		imgMsg := &waProto.ImageMessage{
-			Mimetype:      proto.String(http.DetectContentType(webpByte)),
-			Url:           &uploadResp.URL,
-			DirectPath:    &uploadResp.DirectPath,
-			MediaKey:      uploadResp.MediaKey,
-			FileEncSha256: uploadResp.FileEncSHA256,
-			FileSha256:    uploadResp.FileSHA256,
-			FileLength:    &uploadResp.FileLength,
-			Width:         &width,
-			Height:        &height,
 		}
 
 		response := &waProto.Message{

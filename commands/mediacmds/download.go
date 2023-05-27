@@ -1,10 +1,8 @@
 package mediacmds
 
 import (
-	"bytes"
 	"context"
 	"errors"
-	"image"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -52,31 +50,9 @@ func init() {
 		}
 
 		if strings.Contains(mimeType, "image") {
-			uploadResp, err := client.Upload(context.Background(), buffer, whatsmeow.MediaImage)
+			imgMsg, err := utils.CreateImgMessage(client, buffer)
 			if err != nil {
 				return nil, err
-			}
-
-			img, _, err := image.Decode(bytes.NewBuffer(buffer))
-			if err != nil {
-				return nil, err
-			}
-			g := img.Bounds()
-
-			// Get height and width
-			width := uint32(g.Dx())
-			height := uint32(g.Dy())
-
-			imgMsg := &waProto.ImageMessage{
-				Mimetype:      &mimeType,
-				Url:           &uploadResp.URL,
-				DirectPath:    &uploadResp.DirectPath,
-				MediaKey:      uploadResp.MediaKey,
-				FileEncSha256: uploadResp.FileEncSHA256,
-				FileSha256:    uploadResp.FileSHA256,
-				FileLength:    &uploadResp.FileLength,
-				Width:         &width,
-				Height:        &height,
 			}
 
 			response := &waProto.Message{

@@ -1,20 +1,15 @@
 package mediacmds
 
 import (
-	"bytes"
-	"context"
-	"image"
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
-	"net/http"
 	"strings"
 
 	"github.com/SushiWaUmai/prince/utils"
 	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
 	"go.mau.fi/whatsmeow/types"
-	"google.golang.org/protobuf/proto"
 )
 
 var animeCategories = []string{
@@ -76,31 +71,9 @@ func init() {
 			return nil, err
 		}
 
-		uploadResp, err := client.Upload(context.Background(), buffer, whatsmeow.MediaImage)
+		imgMsg, err := utils.CreateImgMessage(client, buffer)
 		if err != nil {
 			return nil, err
-		}
-
-		img, _, err := image.Decode(bytes.NewBuffer(buffer))
-		if err != nil {
-			return nil, err
-		}
-		g := img.Bounds()
-
-		// Get height and width
-		width := uint32(g.Dx())
-		height := uint32(g.Dy())
-
-		imgMsg := &waProto.ImageMessage{
-			Mimetype:      proto.String(http.DetectContentType(buffer)),
-			Url:           &uploadResp.URL,
-			DirectPath:    &uploadResp.DirectPath,
-			MediaKey:      uploadResp.MediaKey,
-			FileEncSha256: uploadResp.FileEncSHA256,
-			FileSha256:    uploadResp.FileSHA256,
-			FileLength:    &uploadResp.FileLength,
-			Width:         &width,
-			Height:        &height,
 		}
 
 		response := &waProto.Message{

@@ -17,6 +17,37 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+func CreateImgMessage(client *whatsmeow.Client, buffer []byte) (*waProto.ImageMessage, error) {
+	uploadResp, err := client.Upload(context.Background(), buffer, whatsmeow.MediaImage)
+	if err != nil {
+		return nil, err
+	}
+
+	img, _, err := image.Decode(bytes.NewBuffer(buffer))
+	if err != nil {
+		return nil, err
+	}
+	g := img.Bounds()
+
+	// Get height and width
+	width := uint32(g.Dx())
+	height := uint32(g.Dy())
+
+	imgMsg := &waProto.ImageMessage{
+		Mimetype:      proto.String(http.DetectContentType(buffer)),
+		Url:           &uploadResp.URL,
+		DirectPath:    &uploadResp.DirectPath,
+		MediaKey:      uploadResp.MediaKey,
+		FileEncSha256: uploadResp.FileEncSHA256,
+		FileSha256:    uploadResp.FileSHA256,
+		FileLength:    &uploadResp.FileLength,
+		Width:         &width,
+		Height:        &height,
+	}
+
+	return imgMsg, nil
+}
+
 func CreateImgCmd(process func(image.Image) *image.NRGBA) func(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 	return func(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		if pipe == nil || pipe.ImageMessage == nil {
@@ -38,36 +69,18 @@ func CreateImgCmd(process func(image.Image) *image.NRGBA) func(client *whatsmeow
 		}
 		img = process(img)
 
-		g := img.Bounds()
-
-		// Get height and width
-		width := uint32(g.Dx())
-		height := uint32(g.Dy())
-
 		webpByte, err := webp.EncodeRGBA(img, *proto.Float32(1))
 		if err != nil {
 			return nil, err
 		}
 
-		uploadResp, err := client.Upload(context.Background(), webpByte, whatsmeow.MediaImage)
+		imgMsg, err = CreateImgMessage(client, webpByte)
 		if err != nil {
 			return nil, err
 		}
 
-		invertedImgMsg := &waProto.ImageMessage{
-			Mimetype:      proto.String(http.DetectContentType(webpByte)),
-			Url:           &uploadResp.URL,
-			DirectPath:    &uploadResp.DirectPath,
-			MediaKey:      uploadResp.MediaKey,
-			FileEncSha256: uploadResp.FileEncSHA256,
-			FileSha256:    uploadResp.FileSHA256,
-			FileLength:    &uploadResp.FileLength,
-			Width:         &width,
-			Height:        &height,
-		}
-
 		response := &waProto.Message{
-			ImageMessage: invertedImgMsg,
+			ImageMessage: imgMsg,
 		}
 		return response, nil
 	}
