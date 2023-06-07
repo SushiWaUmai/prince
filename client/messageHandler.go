@@ -4,14 +4,51 @@ import (
 	"log"
 
 	"github.com/SushiWaUmai/prince/db"
+	"github.com/SushiWaUmai/prince/utils"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
 	"go.mau.fi/whatsmeow/types"
 	"go.mau.fi/whatsmeow/types/events"
 	"google.golang.org/protobuf/proto"
+	"mvdan.cc/xurls/v2"
 )
 
 func (client *PrinceClient) handleMessage(e *events.Message) {
 	client.handleCommand(e.Message, e.Info.ID, e.Info.Chat, e.Info.Sender.User)
+	client.handleMessageEvents(e)
+}
+
+func (client *PrinceClient) handleMessageEvents(e *events.Message) {
+	jid := e.Info.Chat.String()
+
+	msgEvents := db.GetMessageEvents(jid)
+
+	for _, evt := range msgEvents {
+		switch evt.Type {
+		case "DOWNLOAD":
+			client.handleMessageDownload(e)
+		}
+	}
+}
+
+func (client *PrinceClient) handleMessageDownload(e *events.Message) {
+	content, _ := utils.GetTextContext(e.Message)
+
+	rxStrict := xurls.Strict()
+	fetchUrl := rxStrict.FindString(content)
+
+	msg, err := utils.GetMedia(client.wac, fetchUrl)
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	_, err = client.SendMessage(e.Info.Chat, msg)
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
 }
 
 func (client *PrinceClient) sendRepeatedMessage(msg db.RepeatedMessage) error {
