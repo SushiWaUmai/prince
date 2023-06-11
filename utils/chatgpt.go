@@ -41,3 +41,22 @@ func GetChatReponse(chat types.JID, prompt string) (string, error) {
 func ClearChat(chat types.JID) {
 	PastMessages[chat] = make([]openai.ChatCompletionMessage, 0)
 }
+
+func SetSystemChat(chat types.JID, content string) {
+	// check if there is any openai.ChatMessageRoleSystem
+	// if there is, override
+	for i, msg := range PastMessages[chat] {
+		if msg.Role == openai.ChatMessageRoleSystem {
+			PastMessages[chat][i].Content = content
+			return
+		}
+	}
+
+	// if there isn't, add at the begining
+	PastMessages[chat] = append([]openai.ChatCompletionMessage{
+		{
+			Role:    openai.ChatMessageRoleSystem,
+			Content: content,
+		},
+	}, PastMessages[chat]...)
+}
