@@ -10,14 +10,14 @@ import (
 )
 
 func init() {
-	utils.CreateCommand("autodownload", "OP", func(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
-		enabled := db.ToggleMessageEvent(chat.String(), "DOWNLOAD")
+	utils.CreateCommand("autopilot", "OP", func(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
+		enabled := db.ToggleMessageEvent(chat.String(), "CHAT")
 		var reply string
 
 		if enabled {
-			reply = "AutoDownload enabled"
+			reply = "AutoPilot enabled"
 		} else {
-			reply = "AutoDownload disabled"
+			reply = "AutoPilot disabled"
 		}
 
 		response := &waProto.Message{
@@ -27,3 +27,4 @@ func init() {
 		return response, nil
 	})
 }
+

@@ -26,6 +26,8 @@ func (client *PrinceClient) handleMessageEvents(e *events.Message) {
 		switch evt.Type {
 		case "DOWNLOAD":
 			client.handleMessageDownload(e)
+		case "CHAT":
+			client.handleMessageChat(e)
 		}
 	}
 }
@@ -44,6 +46,30 @@ func (client *PrinceClient) handleMessageDownload(e *events.Message) {
 	}
 
 	_, err = client.SendMessage(e.Info.Chat, msg)
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
+}
+
+func (client *PrinceClient) handleMessageChat(e *events.Message) {
+	content, _ := utils.GetTextContext(e.Message)
+
+	if e.Info.IsFromMe {
+		return
+	}
+
+	reply, err := utils.GetChatReponse(e.Info.Chat, content)
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	_, err = client.SendMessage(e.Info.Chat, &waProto.Message{
+		Conversation: &reply,
+	})
 
 	if err != nil {
 		log.Println(err)
