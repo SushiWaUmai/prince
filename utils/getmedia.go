@@ -2,7 +2,6 @@ package utils
 
 import (
 	"context"
-	"errors"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -15,18 +14,14 @@ import (
 
 func GetMedia(client *whatsmeow.Client, fetchUrl string) (*waProto.Message, error) {
 	resp, err := http.Get(fetchUrl)
-	if err != nil {
-		response := &waProto.Message{
-			Conversation: proto.String("Failed fetch url"),
+	var buffer []byte
+	var mimeType string
+	if err == nil {
+		mimeType = resp.Header.Get("Content-Type")
+		buffer, err = ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return nil, err
 		}
-		return response, errors.New("Failed to fetch url")
-	}
-
-	mimeType := resp.Header.Get("Content-Type")
-
-	buffer, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
 	}
 
 	if strings.Contains(mimeType, "image") {
