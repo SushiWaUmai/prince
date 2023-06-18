@@ -52,7 +52,7 @@ func CreateImgCmd(process func(image.Image) *image.NRGBA) func(client *whatsmeow
 	return func(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 		if pipe == nil || pipe.ImageMessage == nil {
 			response := &waProto.Message{
-				Conversation: proto.String("Please reply to a image message"),
+				Conversation: proto.String("Please reply to an image message"),
 			}
 			return response, errors.New("No ImageMessage quoted")
 		}
