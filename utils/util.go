@@ -76,3 +76,34 @@ func toOgg(audioData []byte, fileName string) ([]byte, error) {
 
 	return os.ReadFile(tmpFileOut.Name())
 }
+
+func VideoToAudio(videoData []byte) ([]byte, error) {
+	// ffmpeg -i $inFileName -acodec libmp3lame -y $outFileName
+	tmpFile, err := os.CreateTemp("", "video*.mp4")
+	if err != nil {
+		return nil, err
+	}
+	defer os.Remove(tmpFile.Name())
+
+	_, err = io.Copy(tmpFile, bytes.NewReader(videoData))
+	if err != nil {
+		return nil, err
+	}
+
+	tmpFileOut, err := os.CreateTemp("", "audio*.ogg")
+	if err != nil {
+		return nil, err
+	}
+	defer os.Remove(tmpFileOut.Name())
+
+	err = ffmpeg.Input(tmpFile.Name()).Output(tmpFileOut.Name(), ffmpeg.KwArgs{
+		"acodec": "libmp3lame",
+		"c:a":    "libopus",
+	}).OverWriteOutput().Run()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return os.ReadFile(tmpFileOut.Name())
+}

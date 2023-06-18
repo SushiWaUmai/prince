@@ -70,10 +70,6 @@ func init() {
 			FileLength:    &uploadResp.FileLength,
 		}
 
-		if err != nil {
-			return nil, err
-		}
-
 		response := &waProto.Message{
 			AudioMessage: audioMsg,
 		}
