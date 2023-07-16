@@ -96,9 +96,10 @@ func VideoToAudio(videoData []byte) ([]byte, error) {
 	}
 	defer os.Remove(tmpFileOut.Name())
 
-	err = ffmpeg.Input(tmpFile.Name()).Output(tmpFileOut.Name(), ffmpeg.KwArgs{
-		"acodec": "libmp3lame",
-		"c:a":    "libopus",
+	err = ffmpeg.Input(tmpFile.Name()).Audio().Output(tmpFileOut.Name(), ffmpeg.KwArgs{
+		"c:a": "libopus",
+		"ac":  "1",
+		"ar":  "16000",
 	}).OverWriteOutput().Run()
 
 	if err != nil {
