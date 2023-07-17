@@ -99,7 +99,6 @@ func VideoToAudio(videoData []byte) ([]byte, error) {
 	err = ffmpeg.Input(tmpFile.Name()).Audio().Output(tmpFileOut.Name(), ffmpeg.KwArgs{
 		"c:a": "libopus",
 		"ac":  "1",
-		"ar":  "16000",
 	}).OverWriteOutput().Run()
 
 	if err != nil {
