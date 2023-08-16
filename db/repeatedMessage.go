@@ -26,7 +26,7 @@ func CreateRepeatedMessage(jid string, user string, message string, repeat strin
 }
 
 func ClearRepeatedMessage(jid string, user string) int64 {
-	result := db.Where("jid = ? AND user = ?", jid, user).Delete(&RepeatedMessage{})
+	result := db.Unscoped().Where("jid = ? AND user = ?", jid, user).Delete(&RepeatedMessage{})
 	return result.RowsAffected
 }
 

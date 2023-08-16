@@ -16,7 +16,7 @@ func CreateMessageEvent(jid string, msgType string) {
 }
 
 func DeleteMessageEvent(jid string, msgType string) {
-	db.Delete(&MessageEvent{}, "jid = ? AND type = ?", jid, msgType)
+	db.Unscoped().Delete(&MessageEvent{}, "jid = ? AND type = ?", jid, msgType)
 }
 
 func ToggleMessageEvent(jid string, msgType string) (bool) {

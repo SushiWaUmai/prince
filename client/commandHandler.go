@@ -1,6 +1,7 @@
 package client
 
 import (
+	"errors"
 	"log"
 	"strings"
 	"time"
@@ -11,6 +12,35 @@ import (
 	"go.mau.fi/whatsmeow/types"
 	"google.golang.org/protobuf/proto"
 )
+
+func getCommand(cmd string) (*utils.CommandInput, error) {
+	// split the command name with the arguments
+	cmd = strings.TrimSpace(cmd)
+	split := strings.Split(cmd, " ")
+
+	cmdName := strings.ToLower(split[0])
+	cmdArgs := split[1:]
+
+	_, ok := utils.CommandMap[cmdName]
+	if !ok {
+		// get alias
+		alias := db.GetAlias(cmdName)
+		if alias == nil {
+			return nil, errors.New("Invalid command: " + cmdName)
+		}
+
+		aliasArgs := strings.Split(alias.Content, " ")
+		cmdName = aliasArgs[0]
+		if len(aliasArgs) > 1 {
+			cmdArgs = append(aliasArgs[1:], cmdArgs...)
+		}
+	}
+
+	return &utils.CommandInput{
+		Name: cmdName,
+		Args: cmdArgs,
+	}, nil
+}
 
 func (client *PrinceClient) handleCommand(message *waProto.Message, msgId types.MessageID, chat types.JID, user string) {
 	content, ctx := utils.GetTextContext(message)
@@ -34,14 +64,14 @@ func (client *PrinceClient) handleCommand(message *waProto.Message, msgId types.
 
 	commandsSplit := strings.Split(content, "|")
 	commandInput := make([]utils.CommandInput, len(commandsSplit))
+
 	for i, c := range commandsSplit {
-		// split the command name with the arguments
-		c = strings.TrimSpace(c)
-		split := strings.Split(c, " ")
-		commandInput[i] = utils.CommandInput{
-			Name: strings.ToLower(split[0]),
-			Args: split[1:],
+		cmd, err := getCommand(c)
+		if err != nil {
+			return
 		}
+
+		commandInput[i] = *cmd
 	}
 
 	// Validate all commands

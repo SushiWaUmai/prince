@@ -16,7 +16,7 @@ func CreateAlias(name string, content string) {
 }
 
 func DeleteAlias(name string) {
-	db.Delete(&Alias{}, "name = ?", name)
+	db.Unscoped().Delete(&Alias{}, "name = ?", name)
 }
 
 func GetAlias(name string) *Alias {
