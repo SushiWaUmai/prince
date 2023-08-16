@@ -2,7 +2,7 @@ package utils
 
 import (
 	"context"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 
@@ -18,7 +18,7 @@ func GetMedia(client *whatsmeow.Client, fetchUrl string) (*waProto.Message, erro
 	var mimeType string
 	if err == nil {
 		mimeType = resp.Header.Get("Content-Type")
-		buffer, err = ioutil.ReadAll(resp.Body)
+		buffer, err = io.ReadAll(resp.Body)
 		if err != nil {
 			return nil, err
 		}
@@ -67,7 +67,7 @@ func GetMedia(client *whatsmeow.Client, fetchUrl string) (*waProto.Message, erro
 		}
 		defer downloadResult.Close()
 
-		buffer, err := ioutil.ReadAll(downloadResult)
+		buffer, err := io.ReadAll(downloadResult)
 		if err != nil {
 			return nil, err
 		}

@@ -3,7 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
@@ -34,7 +34,7 @@ func GetWaifu(category string) ([]byte, error) {
 	}
 	defer resp.Body.Close()
 
-	buffer, err := ioutil.ReadAll(resp.Body)
+	buffer, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}

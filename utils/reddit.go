@@ -3,7 +3,6 @@ package utils
 import (
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 )
@@ -50,7 +49,7 @@ func GetMemeImg(meme *RedditMemeResponse) ([]byte, error) {
 	}
 	defer resp.Body.Close()
 
-	buffer, err := ioutil.ReadAll(resp.Body)
+	buffer, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
