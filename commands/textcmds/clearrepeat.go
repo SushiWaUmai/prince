@@ -12,16 +12,18 @@ import (
 	"github.com/SushiWaUmai/prince/utils"
 )
 
+func ClearRepeatCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
+	// Delete the message
+	affected := db.ClearRepeatedMessage(chat.String(), user)
+
+	// Reply
+	response := &waProto.Message{
+		Conversation: proto.String(fmt.Sprintf("Deleted %d", affected)),
+	}
+
+	return response, nil
+}
+
 func init() {
-	utils.CreateCommand("clearrepeat", "ADMIN", func(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
-		// Delete the message
-		affected := db.ClearRepeatedMessage(chat.String(), user)
-
-		// Reply
-		response := &waProto.Message{
-			Conversation: proto.String(fmt.Sprintf("Deleted %d", affected)),
-		}
-
-		return response, nil
-	})
+	utils.CreateCommand("clearrepeat", "ADMIN", ClearRepeatCommand)
 }

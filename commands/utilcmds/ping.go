@@ -9,16 +9,18 @@ import (
 	"go.mau.fi/whatsmeow/types"
 )
 
-func init() {
-	utils.CreateCommand("ping", "USER", func(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
-		reply := "pong!"
-		if len(args) > 0 {
-			reply = strings.Join(args, " ")
-		}
+func PingCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
+	reply := "pong!"
+	if len(args) > 0 {
+		reply = strings.Join(args, " ")
+	}
 
-		response := &waProto.Message{
-			Conversation: &reply,
-		}
-		return response, nil
-	})
+	response := &waProto.Message{
+		Conversation: &reply,
+	}
+	return response, nil
+}
+
+func init() {
+	utils.CreateCommand("ping", "USER", PingCommand)
 }

@@ -5,6 +5,8 @@ import (
 	"github.com/disintegration/imaging"
 )
 
+var FlipVCommand = utils.CreateImgCmd(imaging.FlipV)
+
 func init() {
-	utils.CreateCommand("flipv", "USER", utils.CreateImgCmd(imaging.FlipV))
+	utils.CreateCommand("flipv", "USER", FlipVCommand)
 }

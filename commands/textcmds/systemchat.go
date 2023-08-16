@@ -9,18 +9,20 @@ import (
 	"go.mau.fi/whatsmeow/types"
 )
 
+func SystemChatCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
+	var text string
+	if len(args) > 0 {
+		text = strings.Join(args, " ")
+	} else {
+		text, _ = utils.GetTextContext(pipe)
+	}
+	text = strings.TrimSpace(text)
+
+	utils.SetSystemChat(chat, text)
+
+	return nil, nil
+}
+
 func init() {
-	utils.CreateCommand("systemchat", "ADMIN", func(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
-		var text string
-		if len(args) > 0 {
-			text = strings.Join(args, " ")
-		} else {
-			text, _ = utils.GetTextContext(pipe)
-		}
-		text = strings.TrimSpace(text)
-
-		utils.SetSystemChat(chat, text)
-
-		return nil, nil
-	})
+	utils.CreateCommand("systemchat", "ADMIN", SystemChatCommand)
 }

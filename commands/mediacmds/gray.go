@@ -5,6 +5,8 @@ import (
 	"github.com/disintegration/imaging"
 )
 
+var GrayscaleCommand = utils.CreateImgCmd(imaging.Grayscale)
+
 func init() {
-	utils.CreateCommand("gray", "USER", utils.CreateImgCmd(imaging.Grayscale))
+	utils.CreateCommand("gray", "USER", GrayscaleCommand)
 }

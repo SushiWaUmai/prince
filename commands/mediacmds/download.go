@@ -12,24 +12,27 @@ import (
 	"mvdan.cc/xurls/v2"
 )
 
-func init() {
-	rxStrict := xurls.Strict()
+var rxStrict = xurls.Strict()
 
-	utils.CreateCommand("download", "USER", func(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
-		text, _ := utils.GetTextContext(pipe)
-		text += " "
+func DownloadCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
+	text, _ := utils.GetTextContext(pipe)
+	text += " "
 
-		text += strings.Join(args, " ")
+	text += strings.Join(args, " ")
 
-		fetchUrl := rxStrict.FindString(text)
+	fetchUrl := rxStrict.FindString(text)
 
-		if fetchUrl == "" {
-			response := &waProto.Message{
-				Conversation: proto.String("Please specify a url"),
-			}
-			return response, errors.New("No fetch url provoided")
+	if fetchUrl == "" {
+		response := &waProto.Message{
+			Conversation: proto.String("Please specify a url"),
 		}
+		return response, errors.New("No fetch url provoided")
+	}
 
-		return utils.GetMedia(client, fetchUrl)
-	})
+	return utils.GetMedia(client, fetchUrl)
+
+}
+
+func init() {
+	utils.CreateCommand("download", "USER", DownloadCommand)
 }

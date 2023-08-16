@@ -5,6 +5,8 @@ import (
 	"github.com/disintegration/imaging"
 )
 
+var InvertCommand = utils.CreateImgCmd(imaging.Invert)
+
 func init() {
-	utils.CreateCommand("invert", "USER", utils.CreateImgCmd(imaging.Invert))
+	utils.CreateCommand("invert", "USER", InvertCommand)
 }

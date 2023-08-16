@@ -9,22 +9,23 @@ import (
 	"github.com/SushiWaUmai/prince/utils"
 )
 
-func init() {
-	utils.CreateCommand("autopilot", "OP", func(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
-		enabled := db.ToggleMessageEvent(chat.String(), "CHAT")
-		var reply string
+func AutoPilotCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
+	enabled := db.ToggleMessageEvent(chat.String(), "CHAT")
+	var reply string
 
-		if enabled {
-			reply = "AutoPilot enabled"
-		} else {
-			reply = "AutoPilot disabled"
-		}
+	if enabled {
+		reply = "AutoPilot enabled"
+	} else {
+		reply = "AutoPilot disabled"
+	}
 
-		response := &waProto.Message{
-			Conversation: &reply,
-		}
+	response := &waProto.Message{
+		Conversation: &reply,
+	}
 
-		return response, nil
-	})
+	return response, nil
 }
 
+func init() {
+	utils.CreateCommand("autopilot", "OP", AutoPilotCommand)
+}

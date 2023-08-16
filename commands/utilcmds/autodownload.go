@@ -9,21 +9,23 @@ import (
 	"github.com/SushiWaUmai/prince/utils"
 )
 
+func AutoDownloadCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
+	enabled := db.ToggleMessageEvent(chat.String(), "DOWNLOAD")
+	var reply string
+
+	if enabled {
+		reply = "AutoDownload enabled"
+	} else {
+		reply = "AutoDownload disabled"
+	}
+
+	response := &waProto.Message{
+		Conversation: &reply,
+	}
+
+	return response, nil
+}
+
 func init() {
-	utils.CreateCommand("autodownload", "OP", func(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
-		enabled := db.ToggleMessageEvent(chat.String(), "DOWNLOAD")
-		var reply string
-
-		if enabled {
-			reply = "AutoDownload enabled"
-		} else {
-			reply = "AutoDownload disabled"
-		}
-
-		response := &waProto.Message{
-			Conversation: &reply,
-		}
-
-		return response, nil
-	})
+	utils.CreateCommand("autodownload", "OP", AutoDownloadCommand)
 }
