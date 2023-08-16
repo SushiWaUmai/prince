@@ -15,6 +15,16 @@ func CreateAlias(name string, content string) {
 	})
 }
 
+func UpsertAlias(name string, content string) {
+	alias := GetAlias(name)
+	if alias == nil {
+		CreateAlias(name, content)
+		return
+	}
+
+	db.Model(&alias).Update("content", content)
+}
+
 func DeleteAlias(name string) {
 	db.Unscoped().Delete(&Alias{}, "name = ?", name)
 }

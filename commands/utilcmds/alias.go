@@ -33,7 +33,7 @@ func aliasCreate(args []string, pipe *waProto.Message) (*waProto.Message, error)
 		return nil, errors.New("No content provided")
 	}
 
-	db.CreateAlias(name, content)
+	db.UpsertAlias(name, content)
 
 	return nil, nil
 }

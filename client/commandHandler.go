@@ -13,7 +13,13 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-func getCommand(cmd string) (*utils.CommandInput, error) {
+var maxDepth = 10
+
+func appendCommandRecursive(cmd string, commandInput []utils.CommandInput, i int) ([]utils.CommandInput, error) {
+	if i > maxDepth {
+		return nil, errors.New("Max Depth reached")
+	}
+
 	// split the command name with the arguments
 	cmd = strings.TrimSpace(cmd)
 	split := strings.Split(cmd, " ")
@@ -26,7 +32,19 @@ func getCommand(cmd string) (*utils.CommandInput, error) {
 		// get alias
 		alias := db.GetAlias(cmdName)
 		if alias == nil {
-			return nil, errors.New("Invalid command: " + cmdName)
+			return commandInput, nil
+		}
+
+		// TODO: Make it work with AST
+		commandsSplit := strings.Split(alias.Content, "|")
+
+		for _, c := range commandsSplit {
+			var err error
+			commandInput, err = appendCommandRecursive(c, commandInput, i+1)
+
+			if err != nil {
+				return nil, err
+			}
 		}
 
 		aliasArgs := strings.Split(alias.Content, " ")
@@ -36,10 +54,16 @@ func getCommand(cmd string) (*utils.CommandInput, error) {
 		}
 	}
 
-	return &utils.CommandInput{
-		Name: cmdName,
-		Args: cmdArgs,
-	}, nil
+	return append(commandInput,
+		utils.CommandInput{
+			Name: cmdName,
+			Args: cmdArgs,
+		},
+	), nil
+}
+
+func appendCommand(cmd string, commandInput []utils.CommandInput) ([]utils.CommandInput, error) {
+	return appendCommandRecursive(cmd, commandInput, 0)
 }
 
 func (client *PrinceClient) handleCommand(message *waProto.Message, msgId types.MessageID, chat types.JID, user string) {
@@ -63,15 +87,16 @@ func (client *PrinceClient) handleCommand(message *waProto.Message, msgId types.
 	content = strings.TrimSpace(content)
 
 	commandsSplit := strings.Split(content, "|")
-	commandInput := make([]utils.CommandInput, len(commandsSplit))
+	var commandInput []utils.CommandInput
 
-	for i, c := range commandsSplit {
-		cmd, err := getCommand(c)
+	for _, c := range commandsSplit {
+		var err error
+		commandInput, err = appendCommand(c, commandInput)
+
 		if err != nil {
+			log.Println(err)
 			return
 		}
-
-		commandInput[i] = *cmd
 	}
 
 	// Validate all commands
