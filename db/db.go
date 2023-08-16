@@ -33,4 +33,9 @@ func init() {
 	if err != nil {
 		log.Panicln("Failed to migrate database:", err)
 	}
+
+	err = db.AutoMigrate(&Alias{})
+	if err != nil {
+		log.Panicln("Failed to migrate database:", err)
+	}
 }
