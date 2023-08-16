@@ -12,10 +12,9 @@ RUN go build
 
 FROM alpine as runner
 RUN apk update
-RUN apk add sqlite ffmpeg pipx --no-cache
+RUN apk add sqlite ffmpeg py3-pip --no-cache
 
-RUN pipx install yt-dlp 
-RUN pipx install spotdl
+RUN pip install yt-dlp spotdl
 
 WORKDIR /
 
