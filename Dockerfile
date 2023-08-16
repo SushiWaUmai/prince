@@ -12,7 +12,11 @@ RUN go build
 
 FROM alpine as runner
 RUN apk update
-RUN apk add sqlite ffmpeg yt-dlp --no-cache
+RUN apk add sqlite ffmpeg pipx --no-cache
+
+RUN pipx install yt-dlp 
+RUN pipx install spotdl
+
 WORKDIR /
 
 COPY --from=builder /prince .
