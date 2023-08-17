@@ -73,7 +73,12 @@ func (client *PrinceClient) handleCommand(message *waProto.Message, msgId types.
 		return
 	}
 
-	perm := db.GetUserPermission(user).Permission
+	userPermission, err := db.GetUserPermission(user)
+	if err != nil {
+		return
+	}
+
+	perm := userPermission.Permission
 	fromMe := client.wac.Store.ID.ToNonAD().User == user
 	if fromMe {
 		perm = "OP"
@@ -131,7 +136,6 @@ func (client *PrinceClient) handleCommand(message *waProto.Message, msgId types.
 		},
 	})
 
-	var err error
 	for _, c := range commandInput {
 		log.Println("Runnning commmand", c.Name, "with args", c.Args)
 		pipe, err = utils.CommandMap[c.Name].Execute(client.wac, chat, user, ctx, pipe, c.Args)

@@ -12,7 +12,6 @@ import (
 	"github.com/wader/goutubedl"
 	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
-	"google.golang.org/protobuf/proto"
 )
 
 func GetMedia(client *whatsmeow.Client, fetchUrl string) (*waProto.Message, error) {
@@ -27,7 +26,7 @@ func GetMedia(client *whatsmeow.Client, fetchUrl string) (*waProto.Message, erro
 		}
 
 		if strings.Contains(mimeType, "image") {
-			response, err := getImage(client, buffer)
+			response, err := CreateImgMessage(client, buffer)
 
 			if err == nil {
 				return response, nil
@@ -35,7 +34,15 @@ func GetMedia(client *whatsmeow.Client, fetchUrl string) (*waProto.Message, erro
 		}
 
 		if strings.Contains(mimeType, "audio") {
-			response, err := getAudio(client, buffer)
+			response, err := CreateAudioMessage(client, buffer)
+
+			if err == nil {
+				return response, nil
+			}
+		}
+
+		if strings.Contains(mimeType, "video") {
+			response, err := CreateVideoMessage(client, buffer)
 
 			if err == nil {
 				return response, nil
@@ -62,40 +69,6 @@ func GetMedia(client *whatsmeow.Client, fetchUrl string) (*waProto.Message, erro
 	return nil, errors.New("Could not download url")
 }
 
-func getImage(client *whatsmeow.Client, buffer []byte) (*waProto.Message, error) {
-	imgMsg, err := CreateImgMessage(client, buffer)
-	if err != nil {
-		return nil, err
-	}
-
-	response := &waProto.Message{
-		ImageMessage: imgMsg,
-	}
-	return response, nil
-}
-
-func getAudio(client *whatsmeow.Client, buffer []byte) (*waProto.Message, error) {
-	uploadResp, err := client.Upload(context.Background(), buffer, whatsmeow.MediaAudio)
-	if err != nil {
-		return nil, err
-	}
-
-	audioMsg := &waProto.AudioMessage{
-		Mimetype:      proto.String("audio/ogg; codecs=opus"),
-		Url:           &uploadResp.URL,
-		DirectPath:    &uploadResp.DirectPath,
-		MediaKey:      uploadResp.MediaKey,
-		FileEncSha256: uploadResp.FileEncSHA256,
-		FileSha256:    uploadResp.FileSHA256,
-		FileLength:    &uploadResp.FileLength,
-	}
-
-	response := &waProto.Message{
-		AudioMessage: audioMsg,
-	}
-	return response, nil
-}
-
 func getYtDlp(client *whatsmeow.Client, fetchUrl string) (*waProto.Message, error) {
 	// yt-dlp
 	goutubedl.Path = "yt-dlp"
@@ -114,24 +87,11 @@ func getYtDlp(client *whatsmeow.Client, fetchUrl string) (*waProto.Message, erro
 		return nil, err
 	}
 
-	uploadResp, err := client.Upload(context.Background(), buffer, whatsmeow.MediaVideo)
+	response, err := CreateVideoMessage(client, buffer)
 	if err != nil {
 		return nil, err
 	}
 
-	videoMsg := &waProto.VideoMessage{
-		Mimetype:      proto.String(http.DetectContentType(buffer)),
-		Url:           &uploadResp.URL,
-		DirectPath:    &uploadResp.DirectPath,
-		MediaKey:      uploadResp.MediaKey,
-		FileEncSha256: uploadResp.FileEncSHA256,
-		FileSha256:    uploadResp.FileSHA256,
-		FileLength:    &uploadResp.FileLength,
-	}
-
-	response := &waProto.Message{
-		VideoMessage: videoMsg,
-	}
 	return response, nil
 }
 
@@ -158,10 +118,5 @@ func getSpotDl(client *whatsmeow.Client, fetchUrl string) (*waProto.Message, err
 		return nil, err
 	}
 
-	audioBuffer, err := Mp3ToOgg(buffer)
-	if err != nil {
-		return nil, err
-	}
-
-	return getAudio(client, audioBuffer)
+	return CreateAudioMessage(client, buffer)
 }

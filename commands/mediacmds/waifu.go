@@ -79,13 +79,9 @@ func WaifuCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *wa
 		return nil, err
 	}
 
-	imgMsg, err := utils.CreateImgMessage(client, buffer)
+	response, err := utils.CreateImgMessage(client, buffer)
 	if err != nil {
 		return nil, err
-	}
-
-	response := &waProto.Message{
-		ImageMessage: imgMsg,
 	}
 	return response, nil
 

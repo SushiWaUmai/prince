@@ -7,7 +7,6 @@ import (
 	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
 	"go.mau.fi/whatsmeow/types"
-	"google.golang.org/protobuf/proto"
 )
 
 func HelpCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
@@ -17,10 +16,7 @@ func HelpCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waP
 		cmds = append(cmds, c.Name)
 	}
 
-	response := &waProto.Message{
-		Conversation: proto.String(strings.Join(cmds, "\n")),
-	}
-	return response, nil
+	return utils.CreateTextMessage(strings.Join(cmds, "\n")), nil
 }
 
 func init() {

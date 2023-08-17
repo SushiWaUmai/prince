@@ -33,11 +33,7 @@ func ChatCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waP
 		return nil, err
 	}
 
-	response := &waProto.Message{
-		Conversation: &reply,
-	}
-
-	return response, nil
+	return utils.CreateTextMessage(reply), nil
 }
 
 func init() {

@@ -10,20 +10,16 @@ import (
 )
 
 func AutoPilotCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
-	enabled := db.ToggleMessageEvent(chat.String(), "CHAT")
-	var reply string
+	enabled, err := db.ToggleMessageEvent(chat.String(), "CHAT")
+	if err != nil {
+		return nil, err
+	}
 
 	if enabled {
-		reply = "AutoPilot enabled"
+		return utils.CreateTextMessage("AutoPilot enabled"), nil
 	} else {
-		reply = "AutoPilot disabled"
+		return utils.CreateTextMessage("AutoPilot disabled"), nil
 	}
-
-	response := &waProto.Message{
-		Conversation: &reply,
-	}
-
-	return response, nil
 }
 
 func init() {

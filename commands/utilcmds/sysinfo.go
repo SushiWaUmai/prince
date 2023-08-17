@@ -8,7 +8,6 @@ import (
 	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
 	"go.mau.fi/whatsmeow/types"
-	"google.golang.org/protobuf/proto"
 
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/host"
@@ -50,10 +49,7 @@ func SystemInformationCommand(client *whatsmeow.Client, chat types.JID, user str
 	infoParse = append(infoParse, fmt.Sprintf("Total Memory: %d", memInfo.Total))
 	infoParse = append(infoParse, fmt.Sprintf("Used Memory: %d", memInfo.Used))
 
-	response := &waProto.Message{
-		Conversation: proto.String(strings.Join(infoParse, "\n")),
-	}
-	return response, nil
+	return utils.CreateTextMessage(strings.Join(infoParse, "\n")), nil
 }
 
 func init() {

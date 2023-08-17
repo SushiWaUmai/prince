@@ -9,7 +9,6 @@ import (
 	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
 	"go.mau.fi/whatsmeow/types"
-	"google.golang.org/protobuf/proto"
 )
 
 func IsIPv4(address string) bool {
@@ -23,10 +22,7 @@ func IsIPv6(address string) bool {
 func IPCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 	pipeString, _ := utils.GetTextContext(pipe)
 	if pipeString == "" && len(args) <= 0 {
-		response := &waProto.Message{
-			Conversation: proto.String("Please specify a url"),
-		}
-		return response, errors.New("No url provided")
+		return utils.CreateTextMessage("Please specify a url"), errors.New("No url provided")
 	}
 
 	var url string
@@ -58,10 +54,7 @@ func IPCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waPro
 		}
 	}
 
-	response := &waProto.Message{
-		Conversation: proto.String(strings.Join(ipParse, "\n")),
-	}
-	return response, nil
+	return utils.CreateTextMessage(strings.Join(ipParse, "\n")), nil
 }
 
 func init() {

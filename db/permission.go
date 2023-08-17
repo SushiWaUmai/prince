@@ -8,19 +8,24 @@ type UserPermission struct {
 	Permission string `gorm:"not null;column:permission"`
 }
 
-func GetUserPermission(userId string) UserPermission {
+func GetUserPermission(userId string) (*UserPermission, error) {
 	// Gets User Permission, if it doesn't exist create one with Permission NONE
 	var userPerm UserPermission
-	db.FirstOrInit(&userPerm, UserPermission{UserID: userId})
+	err := db.FirstOrInit(&userPerm, UserPermission{UserID: userId}).Error
+	if err != nil {
+		return nil, err
+	}
+
 	if userPerm.Permission == "" {
 		userPerm.Permission = "NONE"
 	}
-	db.Save(&userPerm)
-	return userPerm
+	err = db.Save(&userPerm).Error
+
+	return &userPerm, nil
 }
 
-func UpdateUserPermission(userId string, permission string) {
-	db.Model(&UserPermission{}).Where("user_id = ?", userId).Update("permission", permission)
+func UpdateUserPermission(userId string, permission string) error {
+	return db.Model(&UserPermission{}).Where("user_id = ?", userId).Update("permission", permission).Error
 }
 
 func ComparePermission(perm string, command string) bool {

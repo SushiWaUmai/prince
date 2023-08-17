@@ -8,7 +8,6 @@ import (
 	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
 	"go.mau.fi/whatsmeow/types"
-	"google.golang.org/protobuf/proto"
 	"mvdan.cc/xurls/v2"
 )
 
@@ -23,10 +22,7 @@ func DownloadCommand(client *whatsmeow.Client, chat types.JID, user string, ctx 
 	fetchUrl := rxStrict.FindString(text)
 
 	if fetchUrl == "" {
-		response := &waProto.Message{
-			Conversation: proto.String("Please specify a url"),
-		}
-		return response, errors.New("No fetch url provoided")
+		return utils.CreateTextMessage("Please specify a url"), errors.New("No fetch url provided")
 	}
 
 	return utils.GetMedia(client, fetchUrl)

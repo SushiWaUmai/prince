@@ -8,31 +8,39 @@ type MessageEvent struct {
 	Type string `gorm:"not null"`
 }
 
-func CreateMessageEvent(jid string, msgType string) {
-	db.Create(&MessageEvent{
+func CreateMessageEvent(jid string, msgType string) (*MessageEvent, error) {
+	data := &MessageEvent{
 		JID:  jid,
 		Type: msgType,
-	})
+	}
+	err := db.Create(data).Error
+
+	return data, err
 }
 
-func DeleteMessageEvent(jid string, msgType string) {
-	db.Unscoped().Delete(&MessageEvent{}, "jid = ? AND type = ?", jid, msgType)
+func DeleteMessageEvent(jid string, msgType string) error {
+	err := db.Unscoped().Delete(&MessageEvent{}, "jid = ? AND type = ?", jid, msgType).Error
+	return err
 }
 
-func ToggleMessageEvent(jid string, msgType string) (bool) {
+func ToggleMessageEvent(jid string, msgType string) (bool, error) {
 	var msgEvent MessageEvent
-	db.Where("jid = ? AND type = ?", jid, msgType).First(&msgEvent)
+	err := db.Where("jid = ? AND type = ?", jid, msgType).First(&msgEvent).Error
+	if err != nil {
+		return false, err
+	}
+
 	if msgEvent.JID == "" {
-		CreateMessageEvent(jid, msgType)
-		return true
+		_, err := CreateMessageEvent(jid, msgType)
+		return true, err
 	} else {
-		DeleteMessageEvent(jid, msgType)
-		return false
+		err := DeleteMessageEvent(jid, msgType)
+		return false, err
 	}
 }
 
-func GetMessageEvents(jid string) []MessageEvent {
+func GetMessageEvents(jid string) ([]MessageEvent, error) {
 	var msgEvents []MessageEvent
-	db.Where("jid = ?", jid).Find(&msgEvents)
-	return msgEvents
+	err := db.Where("jid = ?", jid).Find(&msgEvents).Error
+	return msgEvents, err
 }

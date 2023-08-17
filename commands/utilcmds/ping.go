@@ -15,10 +15,7 @@ func PingCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waP
 		reply = strings.Join(args, " ")
 	}
 
-	response := &waProto.Message{
-		Conversation: &reply,
-	}
-	return response, nil
+	return utils.CreateTextMessage(reply), nil
 }
 
 func init() {

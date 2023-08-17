@@ -15,28 +15,33 @@ type RepeatedMessage struct {
 	NextDate time.Time `gorm:"not null"`
 }
 
-func CreateRepeatedMessage(jid string, user string, message string, repeat string, nextDate time.Time) {
-	db.Create(&RepeatedMessage{
+func CreateRepeatedMessage(jid string, user string, message string, repeat string, nextDate time.Time) (*RepeatedMessage, error) {
+	data := &RepeatedMessage{
 		JID:      jid,
 		User:     user,
 		Message:  message,
 		Repeat:   repeat,
 		NextDate: nextDate,
-	})
+	}
+
+	err := db.Create(data).Error
+	return data, err
 }
 
-func ClearRepeatedMessage(jid string, user string) int64 {
+func ClearRepeatedMessage(jid string, user string) (int64, error) {
 	result := db.Unscoped().Where("jid = ? AND user = ?", jid, user).Delete(&RepeatedMessage{})
-	return result.RowsAffected
+	return result.RowsAffected, result.Error
 }
 
-func UpdateNextDate(id uint, nextDate time.Time) {
-	db.Model(&RepeatedMessage{}).Where("id = ?", id).Update("next_date", nextDate)
+func UpdateNextDate(id uint, nextDate time.Time) error {
+	return db.Model(&RepeatedMessage{}).Where("id = ?", id).Update("next_date", nextDate).Error
 }
 
-func GetRepeatedMessageToday() []RepeatedMessage {
+func GetRepeatedMessageToday() ([]RepeatedMessage, error) {
 	var messages []RepeatedMessage
+
 	now := time.Now()
-	db.Where("next_date <= ?", now).Find(&messages)
-	return messages
+	err := db.Where("next_date <= ?", now).Find(&messages).Error
+
+	return messages, err
 }

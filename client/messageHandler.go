@@ -8,19 +8,27 @@ import (
 	waProto "go.mau.fi/whatsmeow/binary/proto"
 	"go.mau.fi/whatsmeow/types"
 	"go.mau.fi/whatsmeow/types/events"
-	"google.golang.org/protobuf/proto"
 	"mvdan.cc/xurls/v2"
 )
 
-func (client *PrinceClient) handleMessage(e *events.Message) {
+func (client *PrinceClient) handleMessage(e *events.Message) error {
 	client.handleCommand(e.Message, e.Info.ID, e.Info.Chat, e.Info.Sender.User)
-	client.handleMessageEvents(e)
+
+	err := client.handleMessageEvents(e)
+	if err != nil {
+		return err
+	}
+
+	return err
 }
 
-func (client *PrinceClient) handleMessageEvents(e *events.Message) {
+func (client *PrinceClient) handleMessageEvents(e *events.Message) error {
 	jid := e.Info.Chat.String()
 
-	msgEvents := db.GetMessageEvents(jid)
+	msgEvents, err := db.GetMessageEvents(jid)
+	if err != nil {
+		return err
+	}
 
 	for _, evt := range msgEvents {
 		switch evt.Type {
@@ -30,6 +38,8 @@ func (client *PrinceClient) handleMessageEvents(e *events.Message) {
 			client.handleMessageChat(e)
 		}
 	}
+
+	return nil
 }
 
 func (client *PrinceClient) handleMessageDownload(e *events.Message) {
@@ -83,9 +93,8 @@ func (client *PrinceClient) sendRepeatedMessage(msg db.RepeatedMessage) error {
 		log.Println("Failed to send message:", err)
 		return err
 	}
-	_, err = client.SendCommandMessage(jid, msg.User, &waProto.Message{
-		Conversation: proto.String(msg.Message),
-	})
+
+	_, err = client.SendCommandMessage(jid, msg.User, utils.CreateTextMessage(msg.Message))
 	if err != nil {
 		log.Println("Failed to send message:", err)
 		return err
@@ -103,13 +112,20 @@ func (client *PrinceClient) sendRepeatedMessage(msg db.RepeatedMessage) error {
 		msg.NextDate = msg.NextDate.AddDate(0, 0, 1)
 	}
 
-	db.UpdateNextDate(msg.ID, msg.NextDate)
+	err = db.UpdateNextDate(msg.ID, msg.NextDate)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
 
 func (client *PrinceClient) sendRepeatedMessages() {
-	msgs := db.GetRepeatedMessageToday()
+	msgs, err := db.GetRepeatedMessageToday()
+	if err != nil {
+		log.Println("Failed to send repeated messages:", err)
+		return
+	}
 
 	for _, msg := range msgs {
 		go client.sendRepeatedMessage(msg)

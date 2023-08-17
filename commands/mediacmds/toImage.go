@@ -40,14 +40,11 @@ func ToImageCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *
 		return nil, err
 	}
 
-	imgMsg, err := utils.CreateImgMessage(client, webpByte)
+	response, err := utils.CreateImgMessage(client, webpByte)
 	if err != nil {
 		return nil, err
 	}
 
-	response := &waProto.Message{
-		ImageMessage: imgMsg,
-	}
 	return response, nil
 }
 

@@ -10,20 +10,16 @@ import (
 )
 
 func AutoDownloadCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
-	enabled := db.ToggleMessageEvent(chat.String(), "DOWNLOAD")
-	var reply string
+	enabled, err := db.ToggleMessageEvent(chat.String(), "DOWNLOAD")
+	if err != nil {
+		return nil, err
+	}
 
 	if enabled {
-		reply = "AutoDownload enabled"
+		return utils.CreateTextMessage("AutoDownload enabled"), nil
 	} else {
-		reply = "AutoDownload disabled"
+		return utils.CreateTextMessage("AutoDownload disabled"), nil
 	}
-
-	response := &waProto.Message{
-		Conversation: &reply,
-	}
-
-	return response, nil
 }
 
 func init() {

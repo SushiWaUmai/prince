@@ -14,8 +14,8 @@ func CreateAlias(name string, content string) (*Alias, error) {
 		Content: content,
 	}
 
-	gorm := db.Create(data)
-	return data, gorm.Error
+	err := db.Create(data).Error
+	return data, err
 }
 
 func UpsertAlias(name string, content string) error {
@@ -29,23 +29,22 @@ func UpsertAlias(name string, content string) error {
 		return err
 	}
 
-	gorm := db.Model(&alias).Update("content", content)
+	err = db.Model(&alias).Update("content", content).Error
 
-	return gorm.Error
+	return err
 }
 
 func DeleteAlias(name string) error {
-	gorm := db.Unscoped().Delete(&Alias{}, "name = ?", name)
-	return gorm.Error
+	return db.Unscoped().Delete(&Alias{}, "name = ?", name).Error
 }
 
 func GetAlias(name string) (*Alias, error) {
 	var alias Alias
 
-	gorm := db.First(&alias, "name = ?", name)
+	err := db.First(&alias, "name = ?", name).Error
 	if alias.Name == "" {
-		return nil, gorm.Error
+		return nil, err
 	}
 
-	return &alias, gorm.Error
+	return &alias, err
 }

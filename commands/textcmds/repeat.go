@@ -9,7 +9,6 @@ import (
 	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
 	"go.mau.fi/whatsmeow/types"
-	"google.golang.org/protobuf/proto"
 
 	"github.com/SushiWaUmai/prince/db"
 	"github.com/SushiWaUmai/prince/utils"
@@ -21,42 +20,31 @@ func RepeatCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *w
 	// 3-n. arg: message
 	// TODO: use pipe
 	if len(args) < 3 {
-		repsonse := &waProto.Message{
-			Conversation: proto.String("Usage: repeat <start date> <repeat> <message>"),
-		}
-		return repsonse, errors.New("Not enough arguments")
+		return utils.CreateTextMessage("Usage: repeat <start date> <repeat> <message>"), errors.New("Not enough arguments")
 	}
 
 	// Get the date
 	date, err := time.Parse("02.01.2006", args[0])
 	if err != nil {
-		response := &waProto.Message{
-			Conversation: proto.String("Error parsing date. Please use format dd.mm.yyyy"),
-		}
-		return response, err
+		return utils.CreateTextMessage("Error parsing date. Please use format dd.mm.yyyy"), err
 	}
 
 	// Get the repeat
 	repeat := strings.ToUpper(args[1])
 	if (repeat != "YEARLY") && (repeat != "MONTHLY") && (repeat != "WEEKLY") && (repeat != "DAILY") {
-		response := &waProto.Message{
-			Conversation: proto.String("Error parsing repeat. Please use one of 'YEARLY', 'MONTHLY', 'WEEKLY' or 'DAILY'"),
-		}
-		return response, errors.New("Could not parse repeat")
+		return utils.CreateTextMessage("Error parsing repeat. Please use one of 'YEARLY', 'MONTHLY', 'WEEKLY' or 'DAILY'"), errors.New("Could not parse repeat")
 	}
 
 	// Get the message
 	message := strings.Join(args[2:], " ")
 
 	// Save the message
-	db.CreateRepeatedMessage(chat.String(), user, message, repeat, date)
-
-	// Reply
-	response := &waProto.Message{
-		Conversation: proto.String(fmt.Sprintf("Saved! Sending first message at %s", date.Format("02.01.2006"))),
+	_, err = db.CreateRepeatedMessage(chat.String(), user, message, repeat, date)
+	if err != nil {
+		return nil, err
 	}
 
-	return response, nil
+	return utils.CreateTextMessage(fmt.Sprintf("Saved! Sending first message at %s", date.Format("02.01.2006"))), nil
 }
 
 func init() {

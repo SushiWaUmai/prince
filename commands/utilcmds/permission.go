@@ -9,33 +9,23 @@ import (
 	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
 	"go.mau.fi/whatsmeow/types"
-	"google.golang.org/protobuf/proto"
 )
 
 func PermissionCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 	if len(args) < 1 {
-		response := &waProto.Message{
-			Conversation: proto.String("Usage: permission <permission> <user>"),
-		}
-		return response, errors.New("Not enough arguments")
+		return utils.CreateTextMessage("Usage: permission <permission> <user>"), errors.New("Not enough arguments")
 	}
 
 	perm := strings.ToUpper(args[0])
 
 	// NONE, USER, ADMIN
 	if perm != "NONE" && perm != "USER" && perm != "ADMIN" {
-		response := &waProto.Message{
-			Conversation: proto.String("Invalid permission type. Available: NONE, USER, ADMIN"),
-		}
-		return response, errors.New("Invalid permission type")
+		return utils.CreateTextMessage("Invalid permission type. Available: NONE, USER, ADMIN"), errors.New("Invalid permission type")
 	}
 
 	isGroup := chat.Server == "g.us"
 	if isGroup && (ctx == nil || len(ctx.MentionedJid) <= 0) {
-		response := &waProto.Message{
-			Conversation: proto.String("No user mentioned"),
-		}
-		return response, errors.New("No user mentioned")
+		return utils.CreateTextMessage("No user mentioned"), errors.New("No user mentioned")
 	}
 
 	if isGroup {
@@ -45,16 +35,19 @@ func PermissionCommand(client *whatsmeow.Client, chat types.JID, user string, ct
 				return nil, errors.New("Failed to parse JID")
 			}
 
-			db.UpdateUserPermission(jid.ToNonAD().User, perm)
+			err = db.UpdateUserPermission(jid.ToNonAD().User, perm)
+			if err != nil {
+				return nil, err
+			}
 		}
 	} else {
-		db.UpdateUserPermission(chat.ToNonAD().User, perm)
+		err := db.UpdateUserPermission(chat.ToNonAD().User, perm)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	response := &waProto.Message{
-		Conversation: proto.String("Permission set"),
-	}
-	return response, nil
+	return nil, nil
 }
 
 func init() {

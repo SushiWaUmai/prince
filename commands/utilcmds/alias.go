@@ -8,7 +8,6 @@ import (
 	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
 	"go.mau.fi/whatsmeow/types"
-	"google.golang.org/protobuf/proto"
 
 	"github.com/SushiWaUmai/prince/db"
 	"github.com/SushiWaUmai/prince/utils"
@@ -32,17 +31,10 @@ func AliasCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *wa
 	if content == "" {
 		alias, err := db.GetAlias(name)
 		if err != nil {
-			response := &waProto.Message{
-				Conversation: proto.String("Alias with name \"" + name + "\" not found"),
-			}
-			return response, nil
+			return utils.CreateTextMessage("Alias with name \"" + name + "\" not found"), nil
 		}
 
-		response := &waProto.Message{
-			Conversation: proto.String(alias.Name + "=\"" + alias.Content + "\""),
-		}
-
-		return response, nil
+		return utils.CreateTextMessage(alias.Name + "=\"" + alias.Content + "\""), nil
 	}
 
 	err := db.UpsertAlias(name, content)

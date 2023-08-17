@@ -23,15 +23,12 @@ func MemeCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waP
 		return nil, err
 	}
 
-	imgMsg, err := utils.CreateImgMessage(client, buffer)
+	response, err := utils.CreateImgMessage(client, buffer)
 	if err != nil {
 		return nil, err
 	}
 
-	imgMsg.Caption = &resp.Title
-	response := &waProto.Message{
-		ImageMessage: imgMsg,
-	}
+	response.ImageMessage.Caption = &resp.Title
 	return response, nil
 }
 
