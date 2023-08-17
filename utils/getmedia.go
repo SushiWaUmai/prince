@@ -14,6 +14,8 @@ import (
 	waProto "go.mau.fi/whatsmeow/binary/proto"
 )
 
+var maxVideoLength float64 = 30 * 60
+
 func GetMedia(client *whatsmeow.Client, fetchUrl string) (*waProto.Message, error) {
 	resp, err := http.Get(fetchUrl)
 	var buffer []byte
@@ -76,6 +78,11 @@ func getYtDlp(client *whatsmeow.Client, fetchUrl string) (*waProto.Message, erro
 	if err != nil {
 		return nil, err
 	}
+	seconds := result.Info.Duration
+	if seconds > maxVideoLength {
+		return nil, errors.New("Video is too long")
+	}
+
 	downloadResult, err := result.Download(context.Background(), "best")
 	if err != nil {
 		return nil, err
