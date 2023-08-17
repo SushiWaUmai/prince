@@ -8,32 +8,44 @@ type Alias struct {
 	Content string `gorm:"not null"`
 }
 
-func CreateAlias(name string, content string) {
-	db.Create(&Alias{
+func CreateAlias(name string, content string) (*Alias, error) {
+	data := &Alias{
 		Name:    name,
 		Content: content,
-	})
+	}
+
+	gorm := db.Create(data)
+	return data, gorm.Error
 }
 
-func UpsertAlias(name string, content string) {
-	alias := GetAlias(name)
+func UpsertAlias(name string, content string) error {
+	alias, err := GetAlias(name)
+	if err != nil {
+		return err
+	}
+
 	if alias == nil {
-		CreateAlias(name, content)
-		return
+		_, err := CreateAlias(name, content)
+		return err
 	}
 
-	db.Model(&alias).Update("content", content)
+	gorm := db.Model(&alias).Update("content", content)
+
+	return gorm.Error
 }
 
-func DeleteAlias(name string) {
-	db.Unscoped().Delete(&Alias{}, "name = ?", name)
+func DeleteAlias(name string) error {
+	gorm := db.Unscoped().Delete(&Alias{}, "name = ?", name)
+	return gorm.Error
 }
 
-func GetAlias(name string) *Alias {
+func GetAlias(name string) (*Alias, error) {
 	var alias Alias
-	db.First(&alias, "name = ?", name)
+
+	gorm := db.First(&alias, "name = ?", name)
 	if alias.Name == "" {
-		return nil
+		return nil, gorm.Error
 	}
-	return &alias
+
+	return &alias, gorm.Error
 }
