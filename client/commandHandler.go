@@ -30,9 +30,9 @@ func appendCommandRecursive(cmd string, commandInput []utils.CommandInput, i int
 	_, ok := utils.CommandMap[cmdName]
 	if !ok {
 		// get alias
-		alias := db.GetAlias(cmdName)
-		if alias == nil {
-			return commandInput, nil
+		alias, err := db.GetAlias(cmdName)
+		if err != nil {
+			return commandInput, err
 		}
 
 		// TODO: Make it work with AST
