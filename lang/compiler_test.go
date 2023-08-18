@@ -10,7 +10,7 @@ import (
 func TestCompiler(t *testing.T) {
 	t.Run("Test Compiler with simple command", func(t *testing.T) {
 		assert := assert.New(t)
-		sample := "!ping hello | ping \"hello world\""
+		sample := "!echo hello | echo \"hello world\""
 		tokens := Lex(sample)
 		expressions, err := Parse(tokens)
 		assert.Nil(err)
@@ -19,11 +19,11 @@ func TestCompiler(t *testing.T) {
 
 		assert.Equal([]utils.CommandInput{
 			{
-				Name: "ping",
+				Name: "echo",
 				Args: []string{"hello"},
 			},
 			{
-				Name: "ping",
+				Name: "echo",
 				Args: []string{"hello world"},
 			},
 		}, commandInputs)

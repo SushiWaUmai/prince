@@ -26,7 +26,7 @@ func TestLexer(t *testing.T) {
 
 	t.Run("Test LexIdentifier with simple command", func(t *testing.T) {
 		assert := assert.New(t)
-		sample := "ping hello world"
+		sample := "echo hello world"
 
 		tokens := []Token{}
 		i := 0
@@ -36,7 +36,7 @@ func TestLexer(t *testing.T) {
 		assert.Equal([]Token{
 			{
 				Type:  IDENTIFIER,
-				Lexme: "ping",
+				Lexme: "echo",
 			},
 		}, tokens)
 	})
@@ -77,7 +77,7 @@ func TestLexer(t *testing.T) {
 
 	t.Run("Test Lex with simple command", func(t *testing.T) {
 		assert := assert.New(t)
-		sample := "!ping hello | ping \"hello world\""
+		sample := "!echo hello | echo \"hello world\""
 
 		tokens := Lex(sample)
 		assert.Equal([]Token{
@@ -87,7 +87,7 @@ func TestLexer(t *testing.T) {
 			},
 			{
 				Type:  IDENTIFIER,
-				Lexme: "ping",
+				Lexme: "echo",
 			},
 			{
 				Type:  IDENTIFIER,
@@ -99,7 +99,7 @@ func TestLexer(t *testing.T) {
 			},
 			{
 				Type:  IDENTIFIER,
-				Lexme: "ping",
+				Lexme: "echo",
 			},
 			{
 				Type:  IDENTIFIER,

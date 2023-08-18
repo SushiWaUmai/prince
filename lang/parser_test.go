@@ -11,7 +11,7 @@ import (
 func TestParser(t *testing.T) {
 	t.Run("Test Parser with simple command", func(t *testing.T) {
 		assert := assert.New(t)
-		sample := "!ping hello | ping \"hello world\""
+		sample := "!echo hello | echo \"hello world\""
 
 		tokens := Lex(sample)
 
@@ -21,7 +21,7 @@ func TestParser(t *testing.T) {
 		assert.Equal([]Expression{
 			{
 				Type:    COMMAND,
-				Content: "ping",
+				Content: "echo",
 			},
 			{
 				Type:    ARGUMENT,
@@ -29,7 +29,7 @@ func TestParser(t *testing.T) {
 			},
 			{
 				Type:    COMMAND,
-				Content: "ping",
+				Content: "echo",
 			},
 			{
 				Type:    ARGUMENT,
@@ -40,7 +40,7 @@ func TestParser(t *testing.T) {
 
 	t.Run("Test Parser with invalid prefix", func(t *testing.T) {
 		assert := assert.New(t)
-		sample := "ping asdf | ping test"
+		sample := "echo asdf | echo test"
 
 		tokens := Lex(sample)
 
@@ -51,7 +51,7 @@ func TestParser(t *testing.T) {
 
 	t.Run("Test Parser with invalid pipe", func(t *testing.T) {
 		assert := assert.New(t)
-		sample := "!ping asdf | ping hello |"
+		sample := "!echo asdf | echo hello |"
 
 		tokens := Lex(sample)
 
@@ -82,7 +82,7 @@ func TestParser(t *testing.T) {
 	t.Run("Test Parser with alias", func(t *testing.T) {
 		assert := assert.New(t)
 
-		db.CreateAlias("hello", "ping hello")
+		db.CreateAlias("hello", "echo hello")
 		defer db.DeleteAlias("hello")
 		sample := "!hello"
 
@@ -94,7 +94,7 @@ func TestParser(t *testing.T) {
 			[]Expression{
 				{
 					Type:    COMMAND,
-					Content: "ping",
+					Content: "echo",
 				},
 				{
 					Type:    ARGUMENT,
@@ -108,9 +108,9 @@ func TestParser(t *testing.T) {
 	t.Run("Test Parser with alias with pipes", func(t *testing.T) {
 		assert := assert.New(t)
 
-		db.CreateAlias("hello", "ping hello | chat \"how are you\"")
+		db.CreateAlias("hello", "echo hello | chat \"how are you\"")
 		defer db.DeleteAlias("hello")
-		sample := "!hello | ping \"hello world\""
+		sample := "!hello | echo \"hello world\""
 
 		tokens := Lex(sample)
 		expressions, err := Parse(tokens)
@@ -120,7 +120,7 @@ func TestParser(t *testing.T) {
 			[]Expression{
 				{
 					Type:    COMMAND,
-					Content: "ping",
+					Content: "echo",
 				},
 				{
 					Type:    ARGUMENT,
@@ -136,7 +136,7 @@ func TestParser(t *testing.T) {
 				},
 				{
 					Type:    COMMAND,
-					Content: "ping",
+					Content: "echo",
 				},
 				{
 					Type:    ARGUMENT,
@@ -150,9 +150,9 @@ func TestParser(t *testing.T) {
 	t.Run("Test Parser with alias at argument position", func(t *testing.T) {
 		assert := assert.New(t)
 
-		db.CreateAlias("hello", "ping hello | chat \"how are you\"")
+		db.CreateAlias("hello", "echo hello | chat \"how are you\"")
 		defer db.DeleteAlias("hello")
-		sample := "!ping hello | chat hello world"
+		sample := "!echo hello | chat hello world"
 
 		tokens := Lex(sample)
 		expressions, err := Parse(tokens)
@@ -162,7 +162,7 @@ func TestParser(t *testing.T) {
 			[]Expression{
 				{
 					Type:    COMMAND,
-					Content: "ping",
+					Content: "echo",
 				},
 				{
 					Type:    ARGUMENT,
