@@ -11,22 +11,18 @@ import (
 )
 
 func EchoCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
-	var msg *waProto.Message
-	var text string
 	if len(args) > 0 {
-		text = strings.Join(args, " ")
+		text := strings.Join(args, " ")
 		text = strings.TrimSpace(text)
-		msg = utils.CreateTextMessage(text)
-	} else {
-		msg = pipe
+		return utils.CreateTextMessage(text), nil
 	}
 
-	_, err := client.SendMessage(context.Background(), chat, msg)
+	_, err := client.SendMessage(context.Background(), chat, pipe)
 	if err != nil {
 		return nil, err
 	}
 
-	return msg, nil
+	return pipe, nil
 }
 
 func init() {
