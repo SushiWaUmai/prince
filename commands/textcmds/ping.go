@@ -1,4 +1,4 @@
-package utilcmds
+package textcmds
 
 import (
 	"strings"
