@@ -1,9 +1,9 @@
-name: Build Executable
+name: Build and Test
 
 on: [ push ]
 
 jobs:
-  build:
+  build-and-test:
 
     runs-on: ubuntu-latest
     steps:
@@ -19,3 +19,6 @@ jobs:
 
       - name: Build
         run: go build
+
+      - name: Test
+        run: go test -v ./...
