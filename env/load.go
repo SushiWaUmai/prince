@@ -14,6 +14,8 @@ var (
 func loadEnv() {
 	if os.Getenv("BOT_PREFIX") != "" {
 		BOT_PREFIX = os.Getenv("BOT_PREFIX")[0]
+	} else {
+		BOT_PREFIX = '!'
 	}
 
 	OPENAI_API_KEY = os.Getenv("OPENAI_API_KEY")

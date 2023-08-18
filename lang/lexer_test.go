@@ -3,6 +3,7 @@ package lang
 import (
 	"testing"
 
+	"github.com/SushiWaUmai/prince/env"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -77,7 +78,7 @@ func TestLexer(t *testing.T) {
 
 	t.Run("Test Lex with simple command", func(t *testing.T) {
 		assert := assert.New(t)
-		sample := "!echo hello | echo \"hello world\""
+		sample := string(env.BOT_PREFIX) + "echo hello | echo \"hello world\""
 
 		tokens := Lex(sample)
 		assert.Equal([]Token{

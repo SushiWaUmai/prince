@@ -5,6 +5,7 @@ import (
 
 	_ "github.com/SushiWaUmai/prince/commands"
 	"github.com/SushiWaUmai/prince/db"
+	"github.com/SushiWaUmai/prince/env"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -51,7 +52,7 @@ func TestParser(t *testing.T) {
 
 	t.Run("Test Parser with invalid pipe", func(t *testing.T) {
 		assert := assert.New(t)
-		sample := "!echo asdf | echo hello |"
+		sample := string(env.BOT_PREFIX) + "echo asdf | echo hello |"
 
 		tokens := Lex(sample)
 
@@ -62,7 +63,7 @@ func TestParser(t *testing.T) {
 
 	t.Run("Test Parser with no argument", func(t *testing.T) {
 		assert := assert.New(t)
-		sample := "!download"
+		sample := string(env.BOT_PREFIX) + "download"
 
 		tokens := Lex(sample)
 		expressions, err := Parse(tokens)
@@ -84,7 +85,7 @@ func TestParser(t *testing.T) {
 
 		db.CreateAlias("hello", "echo hello")
 		defer db.DeleteAlias("hello")
-		sample := "!hello"
+		sample := string(env.BOT_PREFIX) + "hello"
 
 		tokens := Lex(sample)
 		expressions, err := Parse(tokens)
@@ -110,7 +111,7 @@ func TestParser(t *testing.T) {
 
 		db.CreateAlias("hello", "echo hello | chat \"how are you\"")
 		defer db.DeleteAlias("hello")
-		sample := "!hello | echo \"hello world\""
+		sample := string(env.BOT_PREFIX) + "hello | echo \"hello world\""
 
 		tokens := Lex(sample)
 		expressions, err := Parse(tokens)

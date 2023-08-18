@@ -3,6 +3,7 @@ package lang
 import (
 	"testing"
 
+	"github.com/SushiWaUmai/prince/env"
 	"github.com/SushiWaUmai/prince/utils"
 	"github.com/stretchr/testify/assert"
 )
@@ -10,7 +11,7 @@ import (
 func TestCompiler(t *testing.T) {
 	t.Run("Test Compiler with simple command", func(t *testing.T) {
 		assert := assert.New(t)
-		sample := "!echo hello | echo \"hello world\""
+		sample := string(env.BOT_PREFIX) + "echo hello | echo \"hello world\""
 		tokens := Lex(sample)
 		expressions, err := Parse(tokens)
 		assert.Nil(err)
