@@ -2,6 +2,8 @@ package lang
 
 import (
 	"unicode"
+
+	"github.com/SushiWaUmai/prince/env"
 )
 
 type TokenType int64
@@ -92,7 +94,7 @@ func LexString(tokens []Token, content string, i int) ([]Token, int, bool) {
 func LexPipe(tokens []Token, content string, i int) ([]Token, int, bool) {
 	c := content[i]
 	result := false
-	if c == '|' || c == '!' {
+	if c == '|' || c == env.BOT_PREFIX {
 		tokens = append(tokens, Token{
 			Type:  SEPARATOR,
 			Lexme: string(c),

@@ -86,6 +86,5 @@ func Parse(tokens []Token) ([]Expression, error) {
 			})
 		}
 	}
-
 	return expressions, nil
 }

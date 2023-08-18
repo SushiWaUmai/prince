@@ -60,6 +60,25 @@ func TestParser(t *testing.T) {
 		assert.NotNil(err)
 	})
 
+	t.Run("Test Parser with no argument", func(t *testing.T) {
+		assert := assert.New(t)
+		sample := "!download"
+
+		tokens := Lex(sample)
+		expressions, err := Parse(tokens)
+		assert.Nil(err)
+
+		assert.Equal(
+			[]Expression{
+				{
+					Type:    COMMAND,
+					Content: "download",
+				},
+			},
+			expressions,
+		)
+	})
+
 	t.Run("Test Parser with alias", func(t *testing.T) {
 		assert := assert.New(t)
 
