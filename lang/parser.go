@@ -24,9 +24,9 @@ func CheckCommand(name string) ([]Token, error) {
 
 	if !ok {
 		// get alias
-		alias, err := db.GetAlias(name)
-		if err != nil {
-			return nil, err
+		alias := db.GetAlias(name)
+		if alias == nil {
+			return nil, errors.New("Command: \"" + name + "\" not found")
 		}
 
 		aliasToken := Lex(alias.Content)

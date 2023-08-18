@@ -11,24 +11,15 @@ import (
 	"mvdan.cc/xurls/v2"
 )
 
-func (client *PrinceClient) handleMessage(e *events.Message) error {
+func (client *PrinceClient) handleMessage(e *events.Message) {
 	client.handleCommand(e.Message, e.Info.ID, e.Info.Chat, e.Info.Sender.User)
-
-	err := client.handleMessageEvents(e)
-	if err != nil {
-		return err
-	}
-
-	return err
+	client.handleMessageEvents(e)
 }
 
-func (client *PrinceClient) handleMessageEvents(e *events.Message) error {
+func (client *PrinceClient) handleMessageEvents(e *events.Message) {
 	jid := e.Info.Chat.String()
 
-	msgEvents, err := db.GetMessageEvents(jid)
-	if err != nil {
-		return err
-	}
+	msgEvents := db.GetMessageEvents(jid)
 
 	for _, evt := range msgEvents {
 		switch evt.Type {
@@ -38,8 +29,6 @@ func (client *PrinceClient) handleMessageEvents(e *events.Message) error {
 			client.handleMessageChat(e)
 		}
 	}
-
-	return nil
 }
 
 func (client *PrinceClient) handleMessageDownload(e *events.Message) {
@@ -121,11 +110,7 @@ func (client *PrinceClient) sendRepeatedMessage(msg db.RepeatedMessage) error {
 }
 
 func (client *PrinceClient) sendRepeatedMessages() {
-	msgs, err := db.GetRepeatedMessageToday()
-	if err != nil {
-		log.Println("Failed to send repeated messages:", err)
-		return
-	}
+	msgs := db.GetRepeatedMessageToday()
 
 	for _, msg := range msgs {
 		go client.sendRepeatedMessage(msg)

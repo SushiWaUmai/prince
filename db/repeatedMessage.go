@@ -37,11 +37,11 @@ func UpdateNextDate(id uint, nextDate time.Time) error {
 	return db.Model(&RepeatedMessage{}).Where("id = ?", id).Update("next_date", nextDate).Error
 }
 
-func GetRepeatedMessageToday() ([]RepeatedMessage, error) {
+func GetRepeatedMessageToday() []RepeatedMessage {
 	var messages []RepeatedMessage
 
 	now := time.Now()
-	err := db.Where("next_date <= ?", now).Find(&messages).Error
+	db.Where("next_date <= ?", now).Find(&messages)
 
-	return messages, err
+	return messages
 }

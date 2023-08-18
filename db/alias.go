@@ -19,17 +19,14 @@ func CreateAlias(name string, content string) (*Alias, error) {
 }
 
 func UpsertAlias(name string, content string) error {
-	alias, err := GetAlias(name)
-	if err != nil {
-		return err
-	}
+	alias := GetAlias(name)
 
 	if alias == nil {
 		_, err := CreateAlias(name, content)
 		return err
 	}
 
-	err = db.Model(&alias).Update("content", content).Error
+	err := db.Model(&alias).Update("content", content).Error
 
 	return err
 }
@@ -38,13 +35,13 @@ func DeleteAlias(name string) error {
 	return db.Unscoped().Delete(&Alias{}, "name = ?", name).Error
 }
 
-func GetAlias(name string) (*Alias, error) {
+func GetAlias(name string) *Alias {
 	var alias Alias
 
-	err := db.First(&alias, "name = ?", name).Error
+	db.First(&alias, "name = ?", name)
 	if alias.Name == "" {
-		return nil, err
+		return nil
 	}
 
-	return &alias, err
+	return &alias
 }

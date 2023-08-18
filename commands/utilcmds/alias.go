@@ -29,8 +29,8 @@ func AliasCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *wa
 	content = strings.TrimSpace(content)
 
 	if content == "" {
-		alias, err := db.GetAlias(name)
-		if err != nil {
+		alias := db.GetAlias(name)
+		if alias == nil {
 			return utils.CreateTextMessage("Alias with name \"" + name + "\" not found"), nil
 		}
 

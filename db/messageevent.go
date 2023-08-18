@@ -39,8 +39,8 @@ func ToggleMessageEvent(jid string, msgType string) (bool, error) {
 	}
 }
 
-func GetMessageEvents(jid string) ([]MessageEvent, error) {
+func GetMessageEvents(jid string) []MessageEvent {
 	var msgEvents []MessageEvent
-	err := db.Where("jid = ?", jid).Find(&msgEvents).Error
-	return msgEvents, err
+	db.Where("jid = ?", jid).Find(&msgEvents)
+	return msgEvents
 }
