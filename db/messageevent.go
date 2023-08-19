@@ -25,10 +25,7 @@ func DeleteMessageEvent(jid string, msgType string) error {
 
 func ToggleMessageEvent(jid string, msgType string) (bool, error) {
 	var msgEvent MessageEvent
-	err := db.Where("jid = ? AND type = ?", jid, msgType).First(&msgEvent).Error
-	if err != nil {
-		return false, err
-	}
+	db.Where("jid = ? AND type = ?", jid, msgType).First(&msgEvent)
 
 	if msgEvent.JID == "" {
 		_, err := CreateMessageEvent(jid, msgType)
