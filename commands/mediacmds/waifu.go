@@ -66,11 +66,7 @@ func WaifuCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *wa
 				msg += strings.Join(animeCategories, ", ")
 			}
 
-			response := &waProto.Message{
-				Conversation: &msg,
-			}
-
-			return response, nil
+			return utils.CreateTextMessage(msg), nil
 		}
 	}
 

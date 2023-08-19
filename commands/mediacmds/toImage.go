@@ -18,10 +18,7 @@ import (
 
 func ToImageCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 	if pipe == nil || pipe.StickerMessage == nil {
-		response := &waProto.Message{
-			Conversation: proto.String("Please reply to a sticker message"),
-		}
-		return response, errors.New("No StickerMessage quoted")
+		return utils.CreateTextMessage("Please reply to a sticker message"), errors.New("No StickerMessage quoted")
 	}
 	stickerImg := pipe.StickerMessage
 
