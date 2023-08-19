@@ -72,7 +72,7 @@ func toOgg(audioData []byte, fileName string) ([]byte, error) {
 	err = ffmpeg.Input(tmpFile.Name()).Output(tmpFileOut.Name(), ffmpeg.KwArgs{
 		"acodec": "libmp3lame",
 		"c:a":    "libopus",
-		"ac":  "1",
+		"ac":     "1",
 	}).OverWriteOutput().Run()
 
 	if err != nil {

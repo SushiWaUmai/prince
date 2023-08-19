@@ -19,24 +19,24 @@ type Token struct {
 	Lexme string
 }
 
-func isAlphaNumeric(c byte) bool {
-	return unicode.IsLetter(rune(c)) || unicode.IsDigit(rune(c))
+func isAlphaNumeric(c rune) bool {
+	return !unicode.IsSpace(c)
 }
 
-func isWhiteSpace(c byte) bool {
-	return unicode.IsSpace(rune(c))
+func isWhiteSpace(c rune) bool {
+	return unicode.IsSpace(c)
 }
 
-func isDoubleQuotation(c byte) bool {
+func isDoubleQuotation(c rune) bool {
 	return c == '"'
 }
 
-func isSingleQuotation(c byte) bool {
+func isSingleQuotation(c rune) bool {
 	return c == '\''
 }
 
-func StringTilChar(content string, i int, startCond func(c byte) bool, endCond func(c byte) bool) (string, int) {
-	var c byte
+func StringTilChar(content []rune, i int, startCond func(c rune) bool, endCond func(c rune) bool) (string, int) {
+	var c rune
 
 	c = content[i]
 	length := len(content)
@@ -62,7 +62,7 @@ func StringTilChar(content string, i int, startCond func(c byte) bool, endCond f
 	return lexme, i
 }
 
-func LexIdentifier(tokens []Token, content string, i int) ([]Token, int, bool) {
+func LexIdentifier(tokens []Token, content []rune, i int) ([]Token, int, bool) {
 	lexme, i := StringTilChar(content, i, isAlphaNumeric, isWhiteSpace)
 	result := false
 	if lexme != "" {
@@ -80,7 +80,7 @@ func LexIdentifier(tokens []Token, content string, i int) ([]Token, int, bool) {
 	return tokens, i, result
 }
 
-func LexDoubleQuoteString(tokens []Token, content string, i int) ([]Token, int, bool) {
+func LexDoubleQuoteString(tokens []Token, content []rune, i int) ([]Token, int, bool) {
 	lexme, i := StringTilChar(content, i, isDoubleQuotation, isDoubleQuotation)
 	result := false
 	if lexme != "" {
@@ -95,7 +95,7 @@ func LexDoubleQuoteString(tokens []Token, content string, i int) ([]Token, int, 
 	return tokens, i, result
 }
 
-func LexSingleQuoteString(tokens []Token, content string, i int) ([]Token, int, bool) {
+func LexSingleQuoteString(tokens []Token, content []rune, i int) ([]Token, int, bool) {
 	lexme, i := StringTilChar(content, i, isSingleQuotation, isSingleQuotation)
 	result := false
 	if lexme != "" {
@@ -110,7 +110,7 @@ func LexSingleQuoteString(tokens []Token, content string, i int) ([]Token, int, 
 	return tokens, i, result
 }
 
-func LexPipe(tokens []Token, content string, i int) ([]Token, int, bool) {
+func LexPipe(tokens []Token, content []rune, i int) ([]Token, int, bool) {
 	c := content[i]
 	result := false
 	if c == '|' || c == env.BOT_PREFIX {
@@ -124,11 +124,13 @@ func LexPipe(tokens []Token, content string, i int) ([]Token, int, bool) {
 	return tokens, i, result
 }
 
-func Lex(content string) []Token {
+func Lex(contentStr string) []Token {
 	var tokens []Token
 	var result bool
 
+	content := []rune(contentStr)
 	length := len(content)
+
 	for i := 0; i < length; i++ {
 		tokens, i, result = LexPipe(tokens, content, i)
 		if result {

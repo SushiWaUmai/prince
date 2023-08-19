@@ -10,7 +10,7 @@ import (
 func TestLexer(t *testing.T) {
 	t.Run("Test LexIdentifier", func(t *testing.T) {
 		assert := assert.New(t)
-		sample := "hello"
+		sample := []rune("hello")
 
 		tokens := []Token{}
 		i := 0
@@ -27,7 +27,7 @@ func TestLexer(t *testing.T) {
 
 	t.Run("Test LexIdentifier with simple command", func(t *testing.T) {
 		assert := assert.New(t)
-		sample := "echo hello world"
+		sample := []rune("echo hello world")
 
 		tokens := []Token{}
 		i := 0
@@ -44,7 +44,7 @@ func TestLexer(t *testing.T) {
 
 	t.Run("Test LexPipe", func(t *testing.T) {
 		assert := assert.New(t)
-		sample := "|"
+		sample := []rune("|")
 
 		tokens := []Token{}
 		i := 0
@@ -61,7 +61,7 @@ func TestLexer(t *testing.T) {
 
 	t.Run("Test LexDoubleQuoteString", func(t *testing.T) {
 		assert := assert.New(t)
-		sample := "\"hello world\""
+		sample := []rune("\"hello world\"")
 
 		tokens := []Token{}
 		i := 0
@@ -78,7 +78,7 @@ func TestLexer(t *testing.T) {
 
 	t.Run("Test LexSingleQuoteString", func(t *testing.T) {
 		assert := assert.New(t)
-		sample := "'hello world'"
+		sample := []rune("'hello world'")
 
 		tokens := []Token{}
 		i := 0
@@ -138,7 +138,7 @@ func TestLexer(t *testing.T) {
 		assert.Equal([]Token{
 			{
 				Type:  SEPARATOR,
-				Lexme: "!",
+				Lexme: string(env.BOT_PREFIX),
 			},
 			{
 				Type:  IDENTIFIER,
@@ -163,7 +163,7 @@ func TestLexer(t *testing.T) {
 		assert.Equal([]Token{
 			{
 				Type:  SEPARATOR,
-				Lexme: "!",
+				Lexme: string(env.BOT_PREFIX),
 			},
 			{
 				Type:  IDENTIFIER,
@@ -172,6 +172,56 @@ func TestLexer(t *testing.T) {
 			{
 				Type:  IDENTIFIER,
 				Lexme: "hello 'world'",
+			},
+			{
+				Type:  EOF,
+				Lexme: "",
+			},
+		}, tokens)
+	})
+
+	t.Run("Test with non ASCII character", func(t *testing.T) {
+		assert := assert.New(t)
+		sample := string(env.BOT_PREFIX) + "echo こんにちは"
+
+		tokens := Lex(sample)
+		assert.Equal([]Token{
+			{
+				Type:  SEPARATOR,
+				Lexme: string(env.BOT_PREFIX),
+			},
+			{
+				Type:  IDENTIFIER,
+				Lexme: "echo",
+			},
+			{
+				Type:  IDENTIFIER,
+				Lexme: "こんにちは",
+			},
+			{
+				Type:  EOF,
+				Lexme: "",
+			},
+		}, tokens)
+	})
+
+	t.Run("Test with emoji", func(t *testing.T) {
+		assert := assert.New(t)
+		sample := string(env.BOT_PREFIX) + "echo 🤔"
+
+		tokens := Lex(sample)
+		assert.Equal([]Token{
+			{
+				Type:  SEPARATOR,
+				Lexme: string(env.BOT_PREFIX),
+			},
+			{
+				Type:  IDENTIFIER,
+				Lexme: "echo",
+			},
+			{
+				Type:  IDENTIFIER,
+				Lexme: "🤔",
 			},
 			{
 				Type:  EOF,

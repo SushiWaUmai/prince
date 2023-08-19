@@ -21,10 +21,10 @@ type PrinceClient struct {
 	wac            *whatsmeow.Client
 	cronJob        *cron.Cron
 	eventHandlerId uint32
-	commandPrefix  byte
+	commandPrefix  rune
 }
 
-func CreatePrinceClient(prefix byte, deviceStore *store.Device) *PrinceClient {
+func CreatePrinceClient(prefix rune, deviceStore *store.Device) *PrinceClient {
 	clientLog := waLog.Stdout("Client", "INFO", true)
 	wac := whatsmeow.NewClient(deviceStore, clientLog)
 	client := &PrinceClient{

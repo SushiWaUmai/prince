@@ -5,7 +5,7 @@ import (
 )
 
 var (
-	BOT_PREFIX                byte
+	BOT_PREFIX                rune
 	OPENAI_API_KEY            string
 	VOICEVOX_ENDPOINT         string
 	STABLE_DIFFUSION_ENDPOINT string
@@ -13,7 +13,7 @@ var (
 
 func loadEnv() {
 	if os.Getenv("BOT_PREFIX") != "" {
-		BOT_PREFIX = os.Getenv("BOT_PREFIX")[0]
+		BOT_PREFIX = []rune(os.Getenv("BOT_PREFIX"))[0]
 	} else {
 		BOT_PREFIX = '!'
 	}

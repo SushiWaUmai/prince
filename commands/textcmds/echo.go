@@ -2,6 +2,7 @@ package textcmds
 
 import (
 	"context"
+	"errors"
 	"strings"
 
 	"github.com/SushiWaUmai/prince/utils"
@@ -15,6 +16,10 @@ func EchoCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waP
 		text := strings.Join(args, " ")
 		text = strings.TrimSpace(text)
 		return utils.CreateTextMessage(text), nil
+	}
+
+	if pipe == nil {
+		return nil, errors.New("No pipe provided")
 	}
 
 	_, err := client.SendMessage(context.Background(), chat, pipe)
