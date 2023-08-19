@@ -59,13 +59,30 @@ func TestLexer(t *testing.T) {
 		}, tokens)
 	})
 
-	t.Run("Test LexString", func(t *testing.T) {
+	t.Run("Test LexDoubleQuoteString", func(t *testing.T) {
 		assert := assert.New(t)
 		sample := "\"hello world\""
 
 		tokens := []Token{}
 		i := 0
-		tokens, i, result := LexString(tokens, sample, i)
+		tokens, i, result := LexDoubleQuoteString(tokens, sample, i)
+		assert.True(result)
+		assert.Equal(12, i)
+		assert.Equal([]Token{
+			{
+				Type:  IDENTIFIER,
+				Lexme: "hello world",
+			},
+		}, tokens)
+	})
+
+	t.Run("Test LexSingleQuoteString", func(t *testing.T) {
+		assert := assert.New(t)
+		sample := "'hello world'"
+
+		tokens := []Token{}
+		i := 0
+		tokens, i, result := LexSingleQuoteString(tokens, sample, i)
 		assert.True(result)
 		assert.Equal(12, i)
 		assert.Equal([]Token{
@@ -105,6 +122,56 @@ func TestLexer(t *testing.T) {
 			{
 				Type:  IDENTIFIER,
 				Lexme: "hello world",
+			},
+			{
+				Type:  EOF,
+				Lexme: "",
+			},
+		}, tokens)
+	})
+
+	t.Run("Test Lex with DoubleQuote inside SingleQuote", func(t *testing.T) {
+		assert := assert.New(t)
+		sample := string(env.BOT_PREFIX) + "echo 'hello \"world\"'"
+
+		tokens := Lex(sample)
+		assert.Equal([]Token{
+			{
+				Type:  SEPARATOR,
+				Lexme: "!",
+			},
+			{
+				Type:  IDENTIFIER,
+				Lexme: "echo",
+			},
+			{
+				Type:  IDENTIFIER,
+				Lexme: "hello \"world\"",
+			},
+			{
+				Type:  EOF,
+				Lexme: "",
+			},
+		}, tokens)
+	})
+
+	t.Run("Test Lex with SingleQuote inside DoubleQuote", func(t *testing.T) {
+		assert := assert.New(t)
+		sample := string(env.BOT_PREFIX) + "echo \"hello 'world'\""
+
+		tokens := Lex(sample)
+		assert.Equal([]Token{
+			{
+				Type:  SEPARATOR,
+				Lexme: "!",
+			},
+			{
+				Type:  IDENTIFIER,
+				Lexme: "echo",
+			},
+			{
+				Type:  IDENTIFIER,
+				Lexme: "hello 'world'",
 			},
 			{
 				Type:  EOF,

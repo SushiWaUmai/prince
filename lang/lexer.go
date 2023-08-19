@@ -27,8 +27,12 @@ func isWhiteSpace(c byte) bool {
 	return unicode.IsSpace(rune(c))
 }
 
-func isQuotation(c byte) bool {
+func isDoubleQuotation(c byte) bool {
 	return c == '"'
+}
+
+func isSingleQuotation(c byte) bool {
+	return c == '\''
 }
 
 func StringTilChar(content string, i int, startCond func(c byte) bool, endCond func(c byte) bool) (string, int) {
@@ -76,8 +80,23 @@ func LexIdentifier(tokens []Token, content string, i int) ([]Token, int, bool) {
 	return tokens, i, result
 }
 
-func LexString(tokens []Token, content string, i int) ([]Token, int, bool) {
-	lexme, i := StringTilChar(content, i, isQuotation, isQuotation)
+func LexDoubleQuoteString(tokens []Token, content string, i int) ([]Token, int, bool) {
+	lexme, i := StringTilChar(content, i, isDoubleQuotation, isDoubleQuotation)
+	result := false
+	if lexme != "" {
+		lexme = lexme[1 : len(lexme)-1]
+		tokens = append(tokens, Token{
+			Type:  IDENTIFIER,
+			Lexme: lexme,
+		})
+		result = true
+	}
+
+	return tokens, i, result
+}
+
+func LexSingleQuoteString(tokens []Token, content string, i int) ([]Token, int, bool) {
+	lexme, i := StringTilChar(content, i, isSingleQuotation, isSingleQuotation)
 	result := false
 	if lexme != "" {
 		lexme = lexme[1 : len(lexme)-1]
@@ -116,7 +135,12 @@ func Lex(content string) []Token {
 			continue
 		}
 
-		tokens, i, result = LexString(tokens, content, i)
+		tokens, i, result = LexDoubleQuoteString(tokens, content, i)
+		if result {
+			continue
+		}
+
+		tokens, i, result = LexSingleQuoteString(tokens, content, i)
 		if result {
 			continue
 		}
