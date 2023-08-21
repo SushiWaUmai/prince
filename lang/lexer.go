@@ -19,30 +19,41 @@ type Token struct {
 	Lexme string
 }
 
-func isAlphaNumeric(c rune) bool {
-	return !unicode.IsSpace(c)
+func isAlphaNumeric(c []rune, i int) bool {
+	return !unicode.IsSpace(c[i])
 }
 
-func isWhiteSpace(c rune) bool {
-	return unicode.IsSpace(c)
+func isWhiteSpace(c []rune, i int) bool {
+	return unicode.IsSpace(c[i])
 }
 
-func isDoubleQuotation(c rune) bool {
-	return c == '"'
+func isDoubleQuotation(c []rune, i int) bool {
+	return c[i] == '"'
 }
 
-func isSingleQuotation(c rune) bool {
-	return c == '\''
+func isSingleQuotation(c []rune, i int) bool {
+	return c[i] == '\''
 }
 
-func StringTilChar(content []rune, i int, startCond func(c rune) bool, endCond func(c rune) bool) (string, int) {
+func isTripleDoubleQuotation(c []rune, i int) bool {
+	if i+2 >= len(c) {
+		return false
+	}
+	return c[i] == '"' && c[i+1] == '"' && c[i+2] == '"'
+}
+
+func isGrave(c []rune, i int) bool {
+	return c[i] == '`'
+}
+
+func StringTilChar(content []rune, i int, startCond func(c []rune, i int) bool, endCond func(c []rune, i int) bool) (string, int) {
 	var c rune
 
 	c = content[i]
 	length := len(content)
 	lexme := ""
 
-	if startCond(c) {
+	if startCond(content, i) {
 		c = content[i]
 		for {
 			lexme += string(c)
@@ -52,7 +63,7 @@ func StringTilChar(content []rune, i int, startCond func(c rune) bool, endCond f
 			}
 
 			c = content[i]
-			if endCond(c) {
+			if endCond(content, i) {
 				lexme += string(c)
 				break
 			}
@@ -110,6 +121,37 @@ func LexSingleQuoteString(tokens []Token, content []rune, i int) ([]Token, int, 
 	return tokens, i, result
 }
 
+func LexTripleDoubleQuoteString(tokens []Token, content []rune, i int) ([]Token, int, bool) {
+	lexme, i := StringTilChar(content, i, isTripleDoubleQuotation, isTripleDoubleQuotation)
+	result := false
+	if lexme != "" {
+		lexme = lexme[3 : len(lexme)-1]
+		i += 2
+		tokens = append(tokens, Token{
+			Type:  IDENTIFIER,
+			Lexme: lexme,
+		})
+		result = true
+	}
+
+	return tokens, i, result
+}
+
+func LexGraveString(tokens []Token, content []rune, i int) ([]Token, int, bool) {
+	lexme, i := StringTilChar(content, i, isGrave, isGrave)
+	result := false
+	if lexme != "" {
+		lexme = lexme[1 : len(lexme)-1]
+		tokens = append(tokens, Token{
+			Type:  IDENTIFIER,
+			Lexme: lexme,
+		})
+		result = true
+	}
+
+	return tokens, i, result
+}
+
 func LexPipe(tokens []Token, content []rune, i int) ([]Token, int, bool) {
 	c := content[i]
 	result := false
@@ -137,12 +179,22 @@ func Lex(contentStr string) []Token {
 			continue
 		}
 
+		tokens, i, result = LexTripleDoubleQuoteString(tokens, content, i)
+		if result {
+			continue
+		}
+
 		tokens, i, result = LexDoubleQuoteString(tokens, content, i)
 		if result {
 			continue
 		}
 
 		tokens, i, result = LexSingleQuoteString(tokens, content, i)
+		if result {
+			continue
+		}
+
+		tokens, i, result = LexGraveString(tokens, content, i)
 		if result {
 			continue
 		}
