@@ -16,10 +16,13 @@ import (
 
 func LuaCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 	var script string
-	if len(args) > 0 {
-		script = strings.Join(args, " ")
+	var luaArgs []string
+	if pipe == nil {
+		script = args[0]
+		luaArgs = args[1:]
 	} else {
 		script, _ = utils.GetTextContext(pipe)
+		luaArgs = args
 	}
 	script = strings.TrimSpace(script)
 
@@ -29,10 +32,17 @@ func LuaCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waPr
 
 	msgSent := 0
 	sendMessage := func(text string) {
-		if msgSent <= 16 {
+		if msgSent < 16 {
 			client.SendMessage(context.Background(), chat, utils.CreateTextMessage(text))
 			msgSent++
 		}
+	}
+	getArg := func(i int) string {
+		if i >= len(luaArgs) {
+			return ""
+		}
+
+		return luaArgs[i]
 	}
 
 	L := lua.NewState()
@@ -44,6 +54,7 @@ func LuaCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waPr
 	L.SetContext(luaCtx)
 
 	L.SetGlobal("sendMessage", luar.New(L, sendMessage))
+	L.SetGlobal("getArg", luar.New(L, getArg))
 	err := L.DoString(script)
 
 	if err != nil {
