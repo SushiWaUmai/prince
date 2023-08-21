@@ -1,39 +1,29 @@
 package db
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 type MessageEvent struct {
 	gorm.Model
-	JID  string `gorm:"not null;column:jid"`
-	Type string `gorm:"not null"`
+	JID     string `gorm:"not null;column:jid;uniqueIndex:jid_content_idx"`
+	Content string `gorm:"not null;uniqueIndex:jid_content_idx"`
 }
 
-func CreateMessageEvent(jid string, msgType string) (*MessageEvent, error) {
+func CreateMessageEvent(jid string, content string) (*MessageEvent, error) {
 	data := &MessageEvent{
-		JID:  jid,
-		Type: msgType,
+		JID:     jid,
+		Content: content,
 	}
+
 	err := db.Create(data).Error
 
 	return data, err
 }
 
-func DeleteMessageEvent(jid string, msgType string) error {
-	err := db.Unscoped().Delete(&MessageEvent{}, "jid = ? AND type = ?", jid, msgType).Error
+func ClearMessageEvents(jid string) error {
+	err := db.Unscoped().Delete(&MessageEvent{}, "jid = ?", jid).Error
 	return err
-}
-
-func ToggleMessageEvent(jid string, msgType string) (bool, error) {
-	var msgEvent MessageEvent
-	db.Where("jid = ? AND type = ?", jid, msgType).First(&msgEvent)
-
-	if msgEvent.JID == "" {
-		_, err := CreateMessageEvent(jid, msgType)
-		return true, err
-	} else {
-		err := DeleteMessageEvent(jid, msgType)
-		return false, err
-	}
 }
 
 func GetMessageEvents(jid string) []MessageEvent {

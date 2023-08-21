@@ -2,7 +2,6 @@ package utilcmds
 
 import (
 	"errors"
-	"log"
 	"strings"
 
 	"go.mau.fi/whatsmeow"
@@ -18,7 +17,6 @@ func AliasCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *wa
 		return nil, errors.New("No name provided")
 	}
 	name := args[0]
-	log.Println(name)
 
 	var content string
 	if len(args) > 1 {

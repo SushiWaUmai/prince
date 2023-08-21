@@ -4,15 +4,17 @@ import (
 	"log"
 
 	"github.com/SushiWaUmai/prince/db"
+	"github.com/SushiWaUmai/prince/env"
 	"github.com/SushiWaUmai/prince/utils"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
 	"go.mau.fi/whatsmeow/types"
 	"go.mau.fi/whatsmeow/types/events"
+	"google.golang.org/protobuf/proto"
 	"mvdan.cc/xurls/v2"
 )
 
 func (client *PrinceClient) handleMessage(e *events.Message) {
-	client.handleCommand(e.Message, e.Info.ID, e.Info.Chat, e.Info.Sender.User)
+	client.handleCommand(e.Message, e.Info.ID, e.Info.Chat, e.Info.Sender.User, false)
 	client.handleMessageEvents(e)
 }
 
@@ -22,12 +24,15 @@ func (client *PrinceClient) handleMessageEvents(e *events.Message) {
 	msgEvents := db.GetMessageEvents(jid)
 
 	for _, evt := range msgEvents {
-		switch evt.Type {
-		case "DOWNLOAD":
-			client.handleMessageDownload(e)
-		case "CHAT":
-			client.handleMessageChat(e)
+		msg := &waProto.Message{
+			ExtendedTextMessage: &waProto.ExtendedTextMessage{
+				Text: proto.String(string(env.BOT_PREFIX) + evt.Content),
+				ContextInfo: &waProto.ContextInfo{
+					QuotedMessage: e.Message,
+				},
+			},
 		}
+		client.handleCommand(msg, e.Info.ID, e.Info.Chat, client.wac.Store.ID.User, true)
 	}
 }
 
