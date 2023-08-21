@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"strings"
+	"time"
 
 	"github.com/SushiWaUmai/prince/utils"
 	"github.com/yuin/gopher-lua"
@@ -26,12 +27,21 @@ func LuaCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waPr
 		return utils.CreateTextMessage("Please input a lua script"), errors.New("No script specified")
 	}
 
+	msgSent := 0
 	sendMessage := func(text string) {
-		client.SendMessage(context.Background(), chat, utils.CreateTextMessage(text))
+		if msgSent <= 16 {
+			client.SendMessage(context.Background(), chat, utils.CreateTextMessage(text))
+			msgSent++
+		}
 	}
 
 	L := lua.NewState()
 	defer L.Close()
+
+	luaCtx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+
+	L.SetContext(luaCtx)
 
 	L.SetGlobal("sendMessage", luar.New(L, sendMessage))
 	err := L.DoString(script)
