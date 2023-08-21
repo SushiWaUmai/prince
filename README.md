@@ -12,7 +12,7 @@ services:
     image: sushiwaumai/prince
     container_name: prince
     volumes:
-      - ./prince.db:/prince.db
+      - ./data:/data
     env_file: .env
 ```
 
