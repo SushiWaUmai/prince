@@ -4,6 +4,6 @@ services:
     container_name: prince
     build: .
     volumes:
-      - ./prince.db:/prince.db
+      - ./data:/data
     env_file:
       .env

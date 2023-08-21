@@ -2,6 +2,7 @@ package db
 
 import (
 	"log"
+	"os"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -12,8 +13,14 @@ var db *gorm.DB
 func init() {
 	var err error
 
+	// Create data directory
+	err = os.Mkdir("data", os.ModePerm)
+	if err != nil {
+		log.Println(err)
+	}
+
 	// Create database connection
-	db, err = gorm.Open(sqlite.Open("prince.db"), &gorm.Config{})
+	db, err = gorm.Open(sqlite.Open("./data/data.db"), &gorm.Config{})
 
 	if err != nil {
 		log.Panicln("Failed to open database connection:", err)
