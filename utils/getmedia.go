@@ -27,6 +27,11 @@ func GetMedia(client *whatsmeow.Client, fetchUrl string) (*waProto.Message, erro
 			return nil, err
 		}
 
+		if strings.Contains(mimeType, "text/plain") {
+			response := CreateTextMessage(string(buffer))
+			return response, nil
+		}
+
 		if strings.Contains(mimeType, "image") {
 			response, err := CreateImgMessage(client, buffer)
 

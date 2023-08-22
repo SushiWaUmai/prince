@@ -26,7 +26,6 @@ func DownloadCommand(client *whatsmeow.Client, chat types.JID, user string, ctx 
 	}
 
 	return utils.GetMedia(client, fetchUrl)
-
 }
 
 func init() {
