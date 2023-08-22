@@ -51,5 +51,5 @@ func PermissionCommand(client *whatsmeow.Client, chat types.JID, user string, ct
 }
 
 func init() {
-	utils.CreateCommand("permission", "OP", PermissionCommand)
+	utils.CreateCommand("permission", "OP", "Sets the permission of an user", PermissionCommand)
 }

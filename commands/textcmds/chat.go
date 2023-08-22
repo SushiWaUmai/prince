@@ -37,5 +37,5 @@ func ChatCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waP
 }
 
 func init() {
-	utils.CreateCommand("chat", "ADMIN", ChatCommand)
+	utils.CreateCommand("chat", "ADMIN", "Generates a chat response based on the provided or replied text using ChatGPT", ChatCommand)
 }

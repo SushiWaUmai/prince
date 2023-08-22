@@ -12,5 +12,5 @@ func PingCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waP
 }
 
 func init() {
-	utils.CreateCommand("ping", "USER", PingCommand)
+	utils.CreateCommand("ping", "USER", "Responds with the message \"pong!\" in the chat ", PingCommand)
 }

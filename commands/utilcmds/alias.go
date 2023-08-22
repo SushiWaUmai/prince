@@ -44,5 +44,5 @@ func AliasCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *wa
 }
 
 func init() {
-	utils.CreateCommand("alias", "ADMIN", AliasCommand)
+	utils.CreateCommand("alias", "ADMIN", "Allows users to set or retrieve aliases", AliasCommand)
 }

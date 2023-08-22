@@ -31,5 +31,5 @@ func EchoCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waP
 }
 
 func init() {
-	utils.CreateCommand("echo", "USER", EchoCommand)
+	utils.CreateCommand("echo", "USER", "Sends back the provided text or replied message", EchoCommand)
 }

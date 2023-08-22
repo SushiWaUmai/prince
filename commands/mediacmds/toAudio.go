@@ -34,5 +34,5 @@ func ToAudioCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *
 }
 
 func init() {
-	utils.CreateCommand("toaudio", "USER", ToAudioCommand)
+	utils.CreateCommand("toaudio", "USER", "Extracts audio from a replied video message", ToAudioCommand)
 }

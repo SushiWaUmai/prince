@@ -46,5 +46,5 @@ func OnMessageCommand(client *whatsmeow.Client, chat types.JID, user string, ctx
 }
 
 func init() {
-	utils.CreateCommand("onmessage", "OP", OnMessageCommand)
+	utils.CreateCommand("onmessage", "OP", "Creates an OnMessage event with the given command in this chat", OnMessageCommand)
 }

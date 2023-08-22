@@ -46,5 +46,5 @@ func ToImageCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *
 }
 
 func init() {
-	utils.CreateCommand("toimage", "USER", ToImageCommand)
+	utils.CreateCommand("toimage", "USER", "Converts sticker into an image", ToImageCommand)
 }

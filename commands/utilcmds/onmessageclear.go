@@ -14,5 +14,5 @@ func OnMessageClearCommand(client *whatsmeow.Client, chat types.JID, user string
 }
 
 func init() {
-	utils.CreateCommand("onmessageclear", "OP", OnMessageClearCommand)
+	utils.CreateCommand("onmessageclear", "OP", "Clears all OnMessage events in this chat", OnMessageClearCommand)
 }

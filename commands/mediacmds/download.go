@@ -30,5 +30,5 @@ func DownloadCommand(client *whatsmeow.Client, chat types.JID, user string, ctx 
 }
 
 func init() {
-	utils.CreateCommand("download", "USER", DownloadCommand)
+	utils.CreateCommand("download", "USER", "Downloads and sends media from a specified URL in a chat message.", DownloadCommand)
 }

@@ -80,9 +80,8 @@ func WaifuCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *wa
 		return nil, err
 	}
 	return response, nil
-
 }
 
 func init() {
-	utils.CreateCommand("waifu", "USER", WaifuCommand)
+	utils.CreateCommand("waifu", "USER", "Fetches and sends a waifu image from a specified category", WaifuCommand)
 }

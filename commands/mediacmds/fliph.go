@@ -8,5 +8,5 @@ import (
 var FlipHCommand = utils.CreateImgCmd(imaging.FlipH)
 
 func init() {
-	utils.CreateCommand("fliph", "USER", FlipHCommand)
+	utils.CreateCommand("fliph", "USER", "Flips an image horizontally", FlipHCommand)
 }

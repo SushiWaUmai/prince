@@ -53,5 +53,5 @@ func TextToSpeechCommand(client *whatsmeow.Client, chat types.JID, user string, 
 }
 
 func init() {
-	utils.CreateCommand("tts", "USER", TextToSpeechCommand)
+	utils.CreateCommand("tts", "USER", "Converts specified or replied text into a voice message", TextToSpeechCommand)
 }

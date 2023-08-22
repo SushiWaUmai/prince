@@ -33,5 +33,5 @@ func MemeCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waP
 }
 
 func init() {
-	utils.CreateCommand("meme", "USER", MemeCommand)
+	utils.CreateCommand("meme", "USER", "Retrieves and sends a meme from a specified subreddit", MemeCommand)
 }

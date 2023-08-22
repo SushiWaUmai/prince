@@ -38,5 +38,5 @@ func StableDiffusionCommand(client *whatsmeow.Client, chat types.JID, user strin
 }
 
 func init() {
-	utils.CreateCommand("sd", "USER", StableDiffusionCommand)
+	utils.CreateCommand("sd", "USER", "Transforms user-provided text into an image using AI", StableDiffusionCommand)
 }

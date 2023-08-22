@@ -57,5 +57,5 @@ func IPInfoCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *w
 }
 
 func init() {
-	utils.CreateCommand("ipinfo", "USER", IPInfoCommand)
+	utils.CreateCommand("ipinfo", "USER", "Find the information of an IP address", IPInfoCommand)
 }

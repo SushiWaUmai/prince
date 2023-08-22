@@ -8,5 +8,5 @@ import (
 var InvertCommand = utils.CreateImgCmd(imaging.Invert)
 
 func init() {
-	utils.CreateCommand("invert", "USER", InvertCommand)
+	utils.CreateCommand("invert", "USER", "Inverts the colors of an image", InvertCommand)
 }

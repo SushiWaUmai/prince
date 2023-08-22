@@ -58,5 +58,5 @@ func IPCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waPro
 }
 
 func init() {
-	utils.CreateCommand("ip", "USER", IPCommand)
+	utils.CreateCommand("ip", "USER", "Retrieves the IP address associated with a given url", IPCommand)
 }

@@ -8,5 +8,5 @@ import (
 var FlipVCommand = utils.CreateImgCmd(imaging.FlipV)
 
 func init() {
-	utils.CreateCommand("flipv", "USER", FlipVCommand)
+	utils.CreateCommand("flipv", "USER", "Flips an image vertically", FlipVCommand)
 }

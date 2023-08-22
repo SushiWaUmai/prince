@@ -53,5 +53,5 @@ func SystemInformationCommand(client *whatsmeow.Client, chat types.JID, user str
 }
 
 func init() {
-	utils.CreateCommand("sysinfo", "ADMIN", SystemInformationCommand)
+	utils.CreateCommand("sysinfo", "ADMIN", "Retrieves the system information where the bot is running on", SystemInformationCommand)
 }

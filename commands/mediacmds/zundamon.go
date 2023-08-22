@@ -13,6 +13,7 @@ import (
 var voicevox = utils.CreateVoiceVoxClient()
 var zundamonIdx = 1
 
+// TODO: Change this to voicevox command and add zundamon alias
 func ZundamonCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 	var text string
 	if len(args) > 0 {
@@ -43,5 +44,5 @@ func ZundamonCommand(client *whatsmeow.Client, chat types.JID, user string, ctx 
 }
 
 func init() {
-	utils.CreateCommand("zundamon", "USER", ZundamonCommand)
+	utils.CreateCommand("zundamon", "USER", "", ZundamonCommand)
 }

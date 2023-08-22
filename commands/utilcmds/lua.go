@@ -65,5 +65,5 @@ func LuaCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waPr
 }
 
 func init() {
-	utils.CreateCommand("lua", "ADMIN", LuaCommand)
+	utils.CreateCommand("lua", "ADMIN", "Executes a lua script", LuaCommand)
 }

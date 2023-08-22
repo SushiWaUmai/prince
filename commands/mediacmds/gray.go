@@ -8,5 +8,5 @@ import (
 var GrayscaleCommand = utils.CreateImgCmd(imaging.Grayscale)
 
 func init() {
-	utils.CreateCommand("gray", "USER", GrayscaleCommand)
+	utils.CreateCommand("gray", "USER", "Converts an image to grayscale", GrayscaleCommand)
 }

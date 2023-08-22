@@ -24,5 +24,5 @@ func SystemChatCommand(client *whatsmeow.Client, chat types.JID, user string, ct
 }
 
 func init() {
-	utils.CreateCommand("systemchat", "ADMIN", SystemChatCommand)
+	utils.CreateCommand("systemchat", "ADMIN", "Updates the system chat setting for ChatGPT", SystemChatCommand)
 }

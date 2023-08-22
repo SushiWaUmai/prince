@@ -32,5 +32,5 @@ func TranscribeCommand(client *whatsmeow.Client, chat types.JID, user string, ct
 }
 
 func init() {
-	utils.CreateCommand("transcribe", "ADMIN", TranscribeCommand)
+	utils.CreateCommand("transcribe", "ADMIN", "Converts a voice message into text",TranscribeCommand)
 }

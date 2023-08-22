@@ -26,5 +26,5 @@ func UnaliasCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *
 }
 
 func init() {
-	utils.CreateCommand("unalias", "ADMIN", UnaliasCommand)
+	utils.CreateCommand("unalias", "ADMIN", "Removes an alias", UnaliasCommand)
 }

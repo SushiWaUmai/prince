@@ -13,5 +13,5 @@ func ClearChatCommand(client *whatsmeow.Client, chat types.JID, user string, ctx
 }
 
 func init() {
-	utils.CreateCommand("clearchat", "ADMIN", ClearChatCommand)
+	utils.CreateCommand("clearchat", "ADMIN", "Clears the ChatGPT chat history", ClearChatCommand)
 }

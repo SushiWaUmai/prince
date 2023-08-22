@@ -14,16 +14,18 @@ type CommandInput struct {
 }
 
 type Command struct {
-	Name       string
-	Permission string
-	Execute    func(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error)
+	Name        string
+	Permission  string
+	Description string
+	Execute     func(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error)
 }
 
-func CreateCommand(name string, permission string, execute func(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error)) {
+func CreateCommand(name string, permission string, description string, execute func(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error)) {
 	CommandMap[name] = Command{
-		Name:       name,
-		Permission: permission,
-		Execute:    execute,
+		Name:        name,
+		Permission:  permission,
+		Description: description,
+		Execute:     execute,
 	}
 }
 
