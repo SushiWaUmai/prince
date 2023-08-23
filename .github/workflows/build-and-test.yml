@@ -12,6 +12,16 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
 
+      - name: Setup Golang caches
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-golang-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-golang-
+
       - name: Install Dependencies
         run: |
           sudo apt update
