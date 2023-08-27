@@ -1,9 +1,10 @@
-package lang
+package lang_test
 
 import (
 	"testing"
 
 	"github.com/SushiWaUmai/prince/env"
+	"github.com/SushiWaUmai/prince/lang"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -12,14 +13,14 @@ func TestLexer(t *testing.T) {
 		assert := assert.New(t)
 		sample := []rune("hello")
 
-		tokens := []Token{}
+		tokens := []lang.Token{}
 		i := 0
-		tokens, i, result := LexIdentifier(tokens, sample, i)
+		tokens, i, result := lang.LexIdentifier(tokens, sample, i)
 		assert.True(result)
 		assert.Equal(5, i)
-		assert.Equal([]Token{
+		assert.Equal([]lang.Token{
 			{
-				Type:  IDENTIFIER,
+				Type:  lang.IDENTIFIER,
 				Lexme: "hello",
 			},
 		}, tokens)
@@ -29,14 +30,14 @@ func TestLexer(t *testing.T) {
 		assert := assert.New(t)
 		sample := []rune("echo hello world")
 
-		tokens := []Token{}
+		tokens := []lang.Token{}
 		i := 0
-		tokens, i, result := LexIdentifier(tokens, sample, i)
+		tokens, i, result := lang.LexIdentifier(tokens, sample, i)
 		assert.True(result)
 		assert.Equal(4, i)
-		assert.Equal([]Token{
+		assert.Equal([]lang.Token{
 			{
-				Type:  IDENTIFIER,
+				Type:  lang.IDENTIFIER,
 				Lexme: "echo",
 			},
 		}, tokens)
@@ -46,14 +47,14 @@ func TestLexer(t *testing.T) {
 		assert := assert.New(t)
 		sample := []rune("|")
 
-		tokens := []Token{}
+		tokens := []lang.Token{}
 		i := 0
-		tokens, i, result := LexPipe(tokens, sample, i)
+		tokens, i, result := lang.LexPipe(tokens, sample, i)
 		assert.True(result)
 		assert.Equal(0, i)
-		assert.Equal([]Token{
+		assert.Equal([]lang.Token{
 			{
-				Type:  SEPARATOR,
+				Type:  lang.SEPARATOR,
 				Lexme: "|",
 			},
 		}, tokens)
@@ -63,14 +64,14 @@ func TestLexer(t *testing.T) {
 		assert := assert.New(t)
 		sample := []rune("\"hello world\"")
 
-		tokens := []Token{}
+		tokens := []lang.Token{}
 		i := 0
-		tokens, i, result := LexDoubleQuoteString(tokens, sample, i)
+		tokens, i, result := lang.LexDoubleQuoteString(tokens, sample, i)
 		assert.True(result)
 		assert.Equal(12, i)
-		assert.Equal([]Token{
+		assert.Equal([]lang.Token{
 			{
-				Type:  IDENTIFIER,
+				Type:  lang.IDENTIFIER,
 				Lexme: "hello world",
 			},
 		}, tokens)
@@ -80,14 +81,14 @@ func TestLexer(t *testing.T) {
 		assert := assert.New(t)
 		sample := []rune("'hello world'")
 
-		tokens := []Token{}
+		tokens := []lang.Token{}
 		i := 0
-		tokens, i, result := LexSingleQuoteString(tokens, sample, i)
+		tokens, i, result := lang.LexSingleQuoteString(tokens, sample, i)
 		assert.True(result)
 		assert.Equal(12, i)
-		assert.Equal([]Token{
+		assert.Equal([]lang.Token{
 			{
-				Type:  IDENTIFIER,
+				Type:  lang.IDENTIFIER,
 				Lexme: "hello world",
 			},
 		}, tokens)
@@ -97,14 +98,14 @@ func TestLexer(t *testing.T) {
 		assert := assert.New(t)
 		sample := []rune("\"\"\"hello world\"\"\"")
 
-		tokens := []Token{}
+		tokens := []lang.Token{}
 		i := 0
-		tokens, i, result := LexTripleDoubleQuoteString(tokens, sample, i)
+		tokens, i, result := lang.LexTripleDoubleQuoteString(tokens, sample, i)
 		assert.True(result)
 		assert.Equal(16, i)
-		assert.Equal([]Token{
+		assert.Equal([]lang.Token{
 			{
-				Type:  IDENTIFIER,
+				Type:  lang.IDENTIFIER,
 				Lexme: "hello world",
 			},
 		}, tokens)
@@ -114,14 +115,14 @@ func TestLexer(t *testing.T) {
 		assert := assert.New(t)
 		sample := []rune("`hello world`")
 
-		tokens := []Token{}
+		tokens := []lang.Token{}
 		i := 0
-		tokens, i, result := LexGraveString(tokens, sample, i)
+		tokens, i, result := lang.LexGraveString(tokens, sample, i)
 		assert.True(result)
 		assert.Equal(12, i)
-		assert.Equal([]Token{
+		assert.Equal([]lang.Token{
 			{
-				Type:  IDENTIFIER,
+				Type:  lang.IDENTIFIER,
 				Lexme: "hello world",
 			},
 		}, tokens)
@@ -131,34 +132,34 @@ func TestLexer(t *testing.T) {
 		assert := assert.New(t)
 		sample := string(env.BOT_PREFIX) + "echo hello | echo \"hello world\""
 
-		tokens := Lex(sample)
-		assert.Equal([]Token{
+		tokens := lang.Lex(sample)
+		assert.Equal([]lang.Token{
 			{
-				Type:  SEPARATOR,
+				Type:  lang.SEPARATOR,
 				Lexme: "!",
 			},
 			{
-				Type:  IDENTIFIER,
+				Type:  lang.IDENTIFIER,
 				Lexme: "echo",
 			},
 			{
-				Type:  IDENTIFIER,
+				Type:  lang.IDENTIFIER,
 				Lexme: "hello",
 			},
 			{
-				Type:  SEPARATOR,
+				Type:  lang.SEPARATOR,
 				Lexme: "|",
 			},
 			{
-				Type:  IDENTIFIER,
+				Type:  lang.IDENTIFIER,
 				Lexme: "echo",
 			},
 			{
-				Type:  IDENTIFIER,
+				Type:  lang.IDENTIFIER,
 				Lexme: "hello world",
 			},
 			{
-				Type:  EOF,
+				Type:  lang.EOF,
 				Lexme: "",
 			},
 		}, tokens)
@@ -168,30 +169,30 @@ func TestLexer(t *testing.T) {
 		assert := assert.New(t)
 		sample := string(env.BOT_PREFIX) + "echo \"\"\"hello world\"\"\" | ping"
 
-		tokens := Lex(sample)
-		assert.Equal([]Token{
+		tokens := lang.Lex(sample)
+		assert.Equal([]lang.Token{
 			{
-				Type:  SEPARATOR,
+				Type:  lang.SEPARATOR,
 				Lexme: string(env.BOT_PREFIX),
 			},
 			{
-				Type:  IDENTIFIER,
+				Type:  lang.IDENTIFIER,
 				Lexme: "echo",
 			},
 			{
-				Type:  IDENTIFIER,
+				Type:  lang.IDENTIFIER,
 				Lexme: "hello world",
 			},
 			{
-				Type:  SEPARATOR,
+				Type:  lang.SEPARATOR,
 				Lexme: "|",
 			},
 			{
-				Type:  IDENTIFIER,
+				Type:  lang.IDENTIFIER,
 				Lexme: "ping",
 			},
 			{
-				Type:  EOF,
+				Type:  lang.EOF,
 				Lexme: "",
 			},
 		}, tokens)
@@ -201,22 +202,22 @@ func TestLexer(t *testing.T) {
 		assert := assert.New(t)
 		sample := string(env.BOT_PREFIX) + "echo 'hello \"world\"'"
 
-		tokens := Lex(sample)
-		assert.Equal([]Token{
+		tokens := lang.Lex(sample)
+		assert.Equal([]lang.Token{
 			{
-				Type:  SEPARATOR,
+				Type:  lang.SEPARATOR,
 				Lexme: string(env.BOT_PREFIX),
 			},
 			{
-				Type:  IDENTIFIER,
+				Type:  lang.IDENTIFIER,
 				Lexme: "echo",
 			},
 			{
-				Type:  IDENTIFIER,
+				Type:  lang.IDENTIFIER,
 				Lexme: "hello \"world\"",
 			},
 			{
-				Type:  EOF,
+				Type:  lang.EOF,
 				Lexme: "",
 			},
 		}, tokens)
@@ -226,22 +227,22 @@ func TestLexer(t *testing.T) {
 		assert := assert.New(t)
 		sample := string(env.BOT_PREFIX) + "echo \"hello 'world'\""
 
-		tokens := Lex(sample)
-		assert.Equal([]Token{
+		tokens := lang.Lex(sample)
+		assert.Equal([]lang.Token{
 			{
-				Type:  SEPARATOR,
+				Type:  lang.SEPARATOR,
 				Lexme: string(env.BOT_PREFIX),
 			},
 			{
-				Type:  IDENTIFIER,
+				Type:  lang.IDENTIFIER,
 				Lexme: "echo",
 			},
 			{
-				Type:  IDENTIFIER,
+				Type:  lang.IDENTIFIER,
 				Lexme: "hello 'world'",
 			},
 			{
-				Type:  EOF,
+				Type:  lang.EOF,
 				Lexme: "",
 			},
 		}, tokens)
@@ -251,22 +252,22 @@ func TestLexer(t *testing.T) {
 		assert := assert.New(t)
 		sample := string(env.BOT_PREFIX) + "echo `hello \"world\"`"
 
-		tokens := Lex(sample)
-		assert.Equal([]Token{
+		tokens := lang.Lex(sample)
+		assert.Equal([]lang.Token{
 			{
-				Type:  SEPARATOR,
+				Type:  lang.SEPARATOR,
 				Lexme: string(env.BOT_PREFIX),
 			},
 			{
-				Type:  IDENTIFIER,
+				Type:  lang.IDENTIFIER,
 				Lexme: "echo",
 			},
 			{
-				Type:  IDENTIFIER,
+				Type:  lang.IDENTIFIER,
 				Lexme: "hello \"world\"",
 			},
 			{
-				Type:  EOF,
+				Type:  lang.EOF,
 				Lexme: "",
 			},
 		}, tokens)
@@ -276,22 +277,22 @@ func TestLexer(t *testing.T) {
 		assert := assert.New(t)
 		sample := string(env.BOT_PREFIX) + "echo こんにちは"
 
-		tokens := Lex(sample)
-		assert.Equal([]Token{
+		tokens := lang.Lex(sample)
+		assert.Equal([]lang.Token{
 			{
-				Type:  SEPARATOR,
+				Type:  lang.SEPARATOR,
 				Lexme: string(env.BOT_PREFIX),
 			},
 			{
-				Type:  IDENTIFIER,
+				Type:  lang.IDENTIFIER,
 				Lexme: "echo",
 			},
 			{
-				Type:  IDENTIFIER,
+				Type:  lang.IDENTIFIER,
 				Lexme: "こんにちは",
 			},
 			{
-				Type:  EOF,
+				Type:  lang.EOF,
 				Lexme: "",
 			},
 		}, tokens)
@@ -301,22 +302,22 @@ func TestLexer(t *testing.T) {
 		assert := assert.New(t)
 		sample := string(env.BOT_PREFIX) + "echo 🤔"
 
-		tokens := Lex(sample)
-		assert.Equal([]Token{
+		tokens := lang.Lex(sample)
+		assert.Equal([]lang.Token{
 			{
-				Type:  SEPARATOR,
+				Type:  lang.SEPARATOR,
 				Lexme: string(env.BOT_PREFIX),
 			},
 			{
-				Type:  IDENTIFIER,
+				Type:  lang.IDENTIFIER,
 				Lexme: "echo",
 			},
 			{
-				Type:  IDENTIFIER,
+				Type:  lang.IDENTIFIER,
 				Lexme: "🤔",
 			},
 			{
-				Type:  EOF,
+				Type:  lang.EOF,
 				Lexme: "",
 			},
 		}, tokens)
@@ -327,38 +328,38 @@ func TestLexer(t *testing.T) {
 		sampleDoubleQuote := string(env.BOT_PREFIX) + "echo \"a\""
 		sampleSingleQuote := string(env.BOT_PREFIX) + "echo 'a'"
 		sampleGraveQuote := string(env.BOT_PREFIX) + "echo `a`"
-		sampleTripeDoubleQuote := string(env.BOT_PREFIX) + "echo \"\"\"a\"\"\"" 
+		sampleTripeDoubleQuote := string(env.BOT_PREFIX) + "echo \"\"\"a\"\"\""
 
-		expected := []Token{
+		expected := []lang.Token{
 			{
-				Type:  SEPARATOR,
+				Type:  lang.SEPARATOR,
 				Lexme: string(env.BOT_PREFIX),
 			},
 			{
-				Type:  IDENTIFIER,
+				Type:  lang.IDENTIFIER,
 				Lexme: "echo",
 			},
 			{
-				Type:  IDENTIFIER,
+				Type:  lang.IDENTIFIER,
 				Lexme: "a",
 			},
 			{
-				Type:  EOF,
+				Type:  lang.EOF,
 				Lexme: "",
 			},
 		}
 
-		var tokens []Token
-		tokens = Lex(sampleDoubleQuote)
+		var tokens []lang.Token
+		tokens = lang.Lex(sampleDoubleQuote)
 		assert.Equal(expected, tokens)
 
-		tokens = Lex(sampleSingleQuote)
+		tokens = lang.Lex(sampleSingleQuote)
 		assert.Equal(expected, tokens)
 
-		tokens = Lex(sampleGraveQuote)
+		tokens = lang.Lex(sampleGraveQuote)
 		assert.Equal(expected, tokens)
 
-		tokens = Lex(sampleTripeDoubleQuote)
+		tokens = lang.Lex(sampleTripeDoubleQuote)
 		assert.Equal(expected, tokens)
 	})
 }

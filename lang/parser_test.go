@@ -1,4 +1,4 @@
-package lang
+package lang_test
 
 import (
 	"testing"
@@ -6,6 +6,7 @@ import (
 	_ "github.com/SushiWaUmai/prince/commands"
 	"github.com/SushiWaUmai/prince/db"
 	"github.com/SushiWaUmai/prince/env"
+	"github.com/SushiWaUmai/prince/lang"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -14,26 +15,26 @@ func TestParser(t *testing.T) {
 		assert := assert.New(t)
 		sample := "!echo hello | echo \"hello world\""
 
-		tokens := Lex(sample)
+		tokens := lang.Lex(sample)
 
-		expressions, err := Parse(tokens)
+		expressions, err := lang.Parse(tokens)
 		assert.Nil(err)
 
-		assert.Equal([]Expression{
+		assert.Equal([]lang.Expression{
 			{
-				Type:    COMMAND,
+				Type:    lang.COMMAND,
 				Content: "echo",
 			},
 			{
-				Type:    ARGUMENT,
+				Type:    lang.ARGUMENT,
 				Content: "hello",
 			},
 			{
-				Type:    COMMAND,
+				Type:    lang.COMMAND,
 				Content: "echo",
 			},
 			{
-				Type:    ARGUMENT,
+				Type:    lang.ARGUMENT,
 				Content: "hello world",
 			},
 		}, expressions)
@@ -43,9 +44,9 @@ func TestParser(t *testing.T) {
 		assert := assert.New(t)
 		sample := "echo asdf | echo test"
 
-		tokens := Lex(sample)
+		tokens := lang.Lex(sample)
 
-		expressions, err := Parse(tokens)
+		expressions, err := lang.Parse(tokens)
 		assert.Nil(expressions)
 		assert.NotNil(err)
 	})
@@ -54,9 +55,9 @@ func TestParser(t *testing.T) {
 		assert := assert.New(t)
 		sample := string(env.BOT_PREFIX) + "echo asdf | echo hello |"
 
-		tokens := Lex(sample)
+		tokens := lang.Lex(sample)
 
-		expressions, err := Parse(tokens)
+		expressions, err := lang.Parse(tokens)
 		assert.Nil(expressions)
 		assert.NotNil(err)
 	})
@@ -65,14 +66,14 @@ func TestParser(t *testing.T) {
 		assert := assert.New(t)
 		sample := string(env.BOT_PREFIX) + "download"
 
-		tokens := Lex(sample)
-		expressions, err := Parse(tokens)
+		tokens := lang.Lex(sample)
+		expressions, err := lang.Parse(tokens)
 		assert.Nil(err)
 
 		assert.Equal(
-			[]Expression{
+			[]lang.Expression{
 				{
-					Type:    COMMAND,
+					Type:    lang.COMMAND,
 					Content: "download",
 				},
 			},
@@ -87,18 +88,18 @@ func TestParser(t *testing.T) {
 		defer db.DeleteAlias("hello")
 		sample := string(env.BOT_PREFIX) + "hello"
 
-		tokens := Lex(sample)
-		expressions, err := Parse(tokens)
+		tokens := lang.Lex(sample)
+		expressions, err := lang.Parse(tokens)
 		assert.Nil(err)
 
 		assert.Equal(
-			[]Expression{
+			[]lang.Expression{
 				{
-					Type:    COMMAND,
+					Type:    lang.COMMAND,
 					Content: "echo",
 				},
 				{
-					Type:    ARGUMENT,
+					Type:    lang.ARGUMENT,
 					Content: "hello",
 				},
 			},
@@ -113,34 +114,34 @@ func TestParser(t *testing.T) {
 		defer db.DeleteAlias("hello")
 		sample := string(env.BOT_PREFIX) + "hello | echo \"hello world\""
 
-		tokens := Lex(sample)
-		expressions, err := Parse(tokens)
+		tokens := lang.Lex(sample)
+		expressions, err := lang.Parse(tokens)
 		assert.Nil(err)
 
 		assert.Equal(
-			[]Expression{
+			[]lang.Expression{
 				{
-					Type:    COMMAND,
+					Type:    lang.COMMAND,
 					Content: "echo",
 				},
 				{
-					Type:    ARGUMENT,
+					Type:    lang.ARGUMENT,
 					Content: "hello",
 				},
 				{
-					Type:    COMMAND,
+					Type:    lang.COMMAND,
 					Content: "chat",
 				},
 				{
-					Type:    ARGUMENT,
+					Type:    lang.ARGUMENT,
 					Content: "how are you",
 				},
 				{
-					Type:    COMMAND,
+					Type:    lang.COMMAND,
 					Content: "echo",
 				},
 				{
-					Type:    ARGUMENT,
+					Type:    lang.ARGUMENT,
 					Content: "hello world",
 				},
 			},
@@ -155,30 +156,30 @@ func TestParser(t *testing.T) {
 		defer db.DeleteAlias("hello")
 		sample := "!echo hello | chat hello world"
 
-		tokens := Lex(sample)
-		expressions, err := Parse(tokens)
+		tokens := lang.Lex(sample)
+		expressions, err := lang.Parse(tokens)
 		assert.Nil(err)
 
 		assert.Equal(
-			[]Expression{
+			[]lang.Expression{
 				{
-					Type:    COMMAND,
+					Type:    lang.COMMAND,
 					Content: "echo",
 				},
 				{
-					Type:    ARGUMENT,
+					Type:    lang.ARGUMENT,
 					Content: "hello",
 				},
 				{
-					Type:    COMMAND,
+					Type:    lang.COMMAND,
 					Content: "chat",
 				},
 				{
-					Type:    ARGUMENT,
+					Type:    lang.ARGUMENT,
 					Content: "hello",
 				},
 				{
-					Type:    ARGUMENT,
+					Type:    lang.ARGUMENT,
 					Content: "world",
 				},
 			},
