@@ -321,4 +321,44 @@ func TestLexer(t *testing.T) {
 			},
 		}, tokens)
 	})
+
+	t.Run("Test with short string", func(t *testing.T) {
+		assert := assert.New(t)
+		sampleDoubleQuote := string(env.BOT_PREFIX) + "echo \"a\""
+		sampleSingleQuote := string(env.BOT_PREFIX) + "echo 'a'"
+		sampleGraveQuote := string(env.BOT_PREFIX) + "echo `a`"
+		sampleTripeDoubleQuote := string(env.BOT_PREFIX) + "echo \"\"\"a\"\"\"" 
+
+		expected := []Token{
+			{
+				Type:  SEPARATOR,
+				Lexme: string(env.BOT_PREFIX),
+			},
+			{
+				Type:  IDENTIFIER,
+				Lexme: "echo",
+			},
+			{
+				Type:  IDENTIFIER,
+				Lexme: "a",
+			},
+			{
+				Type:  EOF,
+				Lexme: "",
+			},
+		}
+
+		var tokens []Token
+		tokens = Lex(sampleDoubleQuote)
+		assert.Equal(expected, tokens)
+
+		tokens = Lex(sampleSingleQuote)
+		assert.Equal(expected, tokens)
+
+		tokens = Lex(sampleGraveQuote)
+		assert.Equal(expected, tokens)
+
+		tokens = Lex(sampleTripeDoubleQuote)
+		assert.Equal(expected, tokens)
+	})
 }
