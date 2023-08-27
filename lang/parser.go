@@ -45,12 +45,12 @@ func Parse(tokens []Token) ([]Expression, error) {
 	// SEPARATOR COMMAND ARG ARG ARG... SEPARATOR COMMAND ARG...
 	for tokens[i].Type != EOF {
 		if tokens[i].Type != SEPARATOR {
-			return nil, errors.New("Invalid syntax")
+			return nil, errors.New("Invalid Syntax: Token \"" + tokens[i].Lexme + "\" is not a SEPARATOR")
 		}
 
 		i++
 		if i >= length || tokens[i].Type != IDENTIFIER {
-			return nil, errors.New("Invalid syntax")
+			return nil, errors.New("Invalid Syntax: Token \"" + tokens[i].Lexme + "\" is not a IDENTIFIER")
 		}
 
 		aliasTokens, err := CheckCommand(tokens[i].Lexme)
@@ -76,7 +76,7 @@ func Parse(tokens []Token) ([]Expression, error) {
 
 		i++
 		if i >= length {
-			return nil, errors.New("Invalid syntax")
+			return nil, errors.New("Invalid syntax: Has to end with EOF")
 		}
 
 		for ; tokens[i].Type == IDENTIFIER; i++ {

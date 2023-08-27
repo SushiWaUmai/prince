@@ -13,7 +13,7 @@ import (
 func TestParser(t *testing.T) {
 	t.Run("Test Parser with simple command", func(t *testing.T) {
 		assert := assert.New(t)
-		sample := "!echo hello | echo \"hello world\""
+		sample := string(env.BOT_PREFIX) + "echo hello | echo \"hello world\""
 
 		tokens := lang.Lex(sample)
 
@@ -42,7 +42,7 @@ func TestParser(t *testing.T) {
 
 	t.Run("Test Parser with invalid prefix", func(t *testing.T) {
 		assert := assert.New(t)
-		sample := "echo asdf | echo test"
+		sample := "invalid-prefixecho asdf | echo test"
 
 		tokens := lang.Lex(sample)
 
@@ -154,7 +154,7 @@ func TestParser(t *testing.T) {
 
 		db.CreateAlias("hello", "echo hello | chat \"how are you\"")
 		defer db.DeleteAlias("hello")
-		sample := "!echo hello | chat hello world"
+		sample := string(env.BOT_PREFIX) + "echo hello | chat hello world"
 
 		tokens := lang.Lex(sample)
 		expressions, err := lang.Parse(tokens)
