@@ -15,8 +15,8 @@ func init() {
 
 	// Create data directory
 	err = os.Mkdir("data", os.ModePerm)
-	if err != nil {
-		log.Println(err)
+	if err != nil && !os.IsExist(err) {
+		log.Panicln(err)
 	}
 
 	// Create database connection

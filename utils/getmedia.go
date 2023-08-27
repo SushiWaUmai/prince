@@ -27,7 +27,7 @@ func GetMedia(client *whatsmeow.Client, fetchUrl string) (*waProto.Message, erro
 			return nil, err
 		}
 
-		if strings.Contains(mimeType, "text/plain") {
+		if strings.Contains(mimeType, "text/plain") || strings.Contains(mimeType, "application/json") {
 			response := CreateTextMessage(string(buffer))
 			return response, nil
 		}
