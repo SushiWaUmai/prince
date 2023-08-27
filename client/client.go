@@ -84,7 +84,7 @@ func (client *PrinceClient) SendCommandMessage(chat types.JID, user string, msg 
 		return resp, err
 	}
 
-	client.handleCommand(msg, resp.ID, chat, user, false)
+	client.handleCommand(msg, resp.ID, chat, user)
 	return resp, err
 }
 

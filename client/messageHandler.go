@@ -9,12 +9,10 @@ import (
 	waProto "go.mau.fi/whatsmeow/binary/proto"
 	"go.mau.fi/whatsmeow/types"
 	"go.mau.fi/whatsmeow/types/events"
-	"google.golang.org/protobuf/proto"
-	"mvdan.cc/xurls/v2"
 )
 
 func (client *PrinceClient) handleMessage(e *events.Message) {
-	client.handleCommand(e.Message, e.Info.ID, e.Info.Chat, e.Info.Sender.User, false)
+	client.handleCommand(e.Message, e.Info.ID, e.Info.Chat, e.Info.Sender.User)
 	client.handleMessageEvents(e)
 }
 
@@ -23,61 +21,19 @@ func (client *PrinceClient) handleMessageEvents(e *events.Message) {
 
 	msgEvents := db.GetMessageEvents(jid)
 
+	ctx := &waProto.ContextInfo{
+		QuotedMessage: e.Message,
+	}
+
+	chat := e.Info.Chat
+	user := client.wac.Store.ID.User
+
 	for _, evt := range msgEvents {
-		msg := &waProto.Message{
-			ExtendedTextMessage: &waProto.ExtendedTextMessage{
-				Text: proto.String(string(env.BOT_PREFIX) + evt.Content),
-				ContextInfo: &waProto.ContextInfo{
-					QuotedMessage: e.Message,
-				},
-			},
+		result, err := RunCommand(client.wac, string(env.BOT_PREFIX)+evt.Content, ctx, chat, user)
+
+		if result != nil && err == nil {
+			client.SendCommandMessage(chat, user, result)
 		}
-		client.handleCommand(msg, e.Info.ID, e.Info.Chat, client.wac.Store.ID.User, true)
-	}
-}
-
-func (client *PrinceClient) handleMessageDownload(e *events.Message) {
-	content, _ := utils.GetTextContext(e.Message)
-
-	rxStrict := xurls.Strict()
-	fetchUrl := rxStrict.FindString(content)
-
-	msg, err := utils.GetMedia(client.wac, fetchUrl)
-
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	_, err = client.SendMessage(e.Info.Chat, msg)
-
-	if err != nil {
-		log.Println(err)
-		return
-	}
-}
-
-func (client *PrinceClient) handleMessageChat(e *events.Message) {
-	content, _ := utils.GetTextContext(e.Message)
-
-	if e.Info.IsFromMe {
-		return
-	}
-
-	reply, err := utils.GetChatReponse(e.Info.Chat, content)
-
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	_, err = client.SendMessage(e.Info.Chat, &waProto.Message{
-		Conversation: &reply,
-	})
-
-	if err != nil {
-		log.Println(err)
-		return
 	}
 }
 
