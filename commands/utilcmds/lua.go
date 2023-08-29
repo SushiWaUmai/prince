@@ -69,7 +69,7 @@ func LuaCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waPr
 	L := lua.NewState()
 	defer L.Close()
 
-	luaCtx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	luaCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
 	L.SetContext(luaCtx)
