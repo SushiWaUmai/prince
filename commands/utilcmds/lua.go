@@ -98,7 +98,11 @@ func LuaCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waPr
 		return utils.CreateTextMessage(err.Error()), err
 	}
 
-	return utils.CreateTextMessage(resultMessage), nil
+	if resultMessage == "" {
+		return nil, nil
+	}
+
+	return utils.CreateTextMessage("```" + resultMessage + "```"), nil
 }
 
 func init() {
