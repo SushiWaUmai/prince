@@ -3,6 +3,7 @@ package utilcmds
 import (
 	"context"
 	"errors"
+	"log"
 	"strings"
 	"time"
 
@@ -35,6 +36,8 @@ func LuaCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waPr
 	var err error
 	msgSent := 0
 	commandExecuted := 0
+	resultMessage := ""
+
 	sendMessage := func(text string) {
 		if msgSent < 16 {
 			client.SendMessage(context.Background(), chat, utils.CreateTextMessage(text))
@@ -43,6 +46,7 @@ func LuaCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waPr
 			err = errors.New("Cannot send more than 16 messages from single a lua script")
 		}
 	}
+
 	executeCommand := func(text string) {
 		if commandExecuted < 8 {
 			var message *waProto.Message
@@ -58,12 +62,11 @@ func LuaCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waPr
 		}
 	}
 
-	getArg := func(i int) string {
-		if i >= len(luaArgs) {
-			return ""
+	printMessage := func(data interface{}) {
+		log.Println(data)
+		if str, ok := data.(string); ok {
+			resultMessage += str + "\n"
 		}
-
-		return luaArgs[i]
 	}
 
 	L := lua.NewState()
@@ -76,7 +79,15 @@ func LuaCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waPr
 
 	L.SetGlobal("sendMessage", luar.New(L, sendMessage))
 	L.SetGlobal("executeCommand", luar.New(L, executeCommand))
-	L.SetGlobal("getArg", luar.New(L, getArg))
+	L.SetGlobal("print", luar.New(L, printMessage))
+
+	lTable := L.NewTable()
+	for i, str := range luaArgs {
+		L.RawSetInt(lTable, i+1, lua.LString(str))
+	}
+
+	L.SetGlobal("arg", lTable)
+
 	luaErr := L.DoString(script)
 
 	if luaErr != nil {
@@ -87,7 +98,7 @@ func LuaCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waPr
 		return utils.CreateTextMessage(err.Error()), err
 	}
 
-	return nil, nil
+	return utils.CreateTextMessage(resultMessage), nil
 }
 
 func init() {

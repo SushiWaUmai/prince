@@ -2,7 +2,6 @@ package mediacmds
 
 import (
 	"errors"
-	"log"
 	"strings"
 
 	"github.com/SushiWaUmai/prince/utils"
@@ -21,8 +20,6 @@ func DownloadCommand(client *whatsmeow.Client, chat types.JID, user string, ctx 
 	text += content
 
 	fetchUrl := rxStrict.FindString(text)
-	log.Println(text)
-	log.Println(fetchUrl)
 
 	if fetchUrl == "" {
 		return utils.CreateTextMessage("Please specify a url"), errors.New("No fetch url provided")
