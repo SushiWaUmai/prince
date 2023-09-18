@@ -81,6 +81,24 @@ func LuaCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waPr
 	L.SetGlobal("executeCommand", luar.New(L, executeCommand))
 	L.SetGlobal("print", luar.New(L, printMessage))
 
+	for _, command := range utils.CommandMap {
+		cmd := command
+		execute := func(arg ...string) string {
+			msg, err := princeClient.RunCommand(client, string(env.BOT_PREFIX)+cmd.Name+" "+strings.Join(arg, " "), ctx, chat, user)
+			if err != nil {
+				log.Println(err)
+				return ""
+			}
+			if msg.Conversation == nil {
+				return ""
+			}
+
+			return *msg.Conversation
+		}
+
+		L.SetGlobal(cmd.Name, luar.New(L, execute))
+	}
+
 	lTable := L.NewTable()
 	for i, str := range luaArgs {
 		L.RawSetInt(lTable, i+1, lua.LString(str))
