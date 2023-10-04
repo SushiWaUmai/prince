@@ -186,4 +186,56 @@ func TestParser(t *testing.T) {
 			expressions,
 		)
 	})
+
+	t.Run("Test Parser with invalid alias", func(t *testing.T) {
+		assert := assert.New(t)
+
+		db.CreateAlias("hello", "thiscommandoesnotexist test")
+		defer db.DeleteAlias("hello")
+		sample := string(env.BOT_PREFIX) + "hello"
+
+		tokens := lang.Lex(sample)
+		expressions, err := lang.Parse(tokens)
+		assert.NotNil(err)
+		assert.Nil(expressions)
+	})
+
+	t.Run("Test Parser with alias within an alias", func(t *testing.T) {
+		assert := assert.New(t)
+
+		db.CreateAlias("greeting", "echo hello")
+		defer db.DeleteAlias("greeting")
+
+		db.CreateAlias("friendly", "greeting | echo \"how are you\"")
+		defer db.DeleteAlias("friendly")
+
+		sample := string(env.BOT_PREFIX) + "friendly"
+
+		tokens := lang.Lex(sample)
+		expressions, err := lang.Parse(tokens)
+		
+		assert.Nil(err)
+
+		assert.Equal(
+			[]lang.Expression{
+				{
+					Type:    lang.COMMAND,
+					Content: "echo",
+				},
+				{
+					Type:    lang.ARGUMENT,
+					Content: "hello",
+				},
+				{
+					Type:    lang.COMMAND,
+					Content: "echo",
+				},
+				{
+					Type:    lang.ARGUMENT,
+					Content: "how are you",
+				},
+			},
+			expressions,
+		)
+	})
 }

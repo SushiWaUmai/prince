@@ -9,6 +9,8 @@ import (
 
 type ExpressionType int64
 
+const MAX_ALIAS_DEPTH = 8
+
 const (
 	COMMAND ExpressionType = iota
 	ARGUMENT
@@ -19,8 +21,13 @@ type Expression struct {
 	Content string
 }
 
-func CheckCommand(name string) ([]Token, error) {
+func CheckCommand(name string) bool {
 	_, ok := utils.CommandMap[name]
+	return ok
+}
+
+func FindAlias(name string) ([]Token, error) {
+	ok := CheckCommand(name)
 
 	if !ok {
 		// get alias
@@ -53,20 +60,27 @@ func Parse(tokens []Token) ([]Expression, error) {
 			return nil, errors.New("Invalid Syntax: Token \"" + tokens[i].Lexme + "\" is not a IDENTIFIER")
 		}
 
-		aliasTokens, err := CheckCommand(tokens[i].Lexme)
-		// replace the current token with alias tokens
-		if err == nil && aliasTokens != nil {
-			// Remove EOF
-			aliasTokens = aliasTokens[:len(aliasTokens)-1]
+		for j := 0; j < MAX_ALIAS_DEPTH; j++ {
+			aliasTokens, err := FindAlias(tokens[i].Lexme)
+			// replace the current token with alias tokens
+			if err == nil && aliasTokens != nil {
+				// Remove EOF
+				aliasTokens = aliasTokens[:len(aliasTokens)-1]
 
-			// Remove current token
-			tokens = append(tokens[:i], tokens[i+1:]...)
-			// Insert alias tokens
-			tokens = append(tokens[:i], append(aliasTokens, tokens[i:]...)...)
+				// Remove current token
+				tokens = append(tokens[:i], tokens[i+1:]...)
+				// Insert alias tokens
+				tokens = append(tokens[:i], append(aliasTokens, tokens[i:]...)...)
 
-			length = len(tokens)
-		} else if err != nil {
-			return nil, err
+				length = len(tokens)
+			} else if err != nil {
+				return nil, err
+			}
+		}
+
+		ok := CheckCommand(tokens[i].Lexme)
+		if !ok {
+			return nil, errors.New("Command: \"" + tokens[i].Lexme + "\" not found")
 		}
 
 		expressions = append(expressions, Expression{
