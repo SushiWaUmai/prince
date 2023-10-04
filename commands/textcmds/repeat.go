@@ -48,5 +48,5 @@ func RepeatCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *w
 }
 
 func init() {
-	utils.CreateCommand("repeat", "USER", "", RepeatCommand)
+	utils.CreateCommand("repeat", "USER", "Creates a repeated command", RepeatCommand)
 }
