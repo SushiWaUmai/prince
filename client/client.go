@@ -100,7 +100,7 @@ func (client *PrinceClient) eventHandler(evt interface{}) {
 }
 
 func (client *PrinceClient) startCronJobs() error {
-	_, err := client.cronJob.AddFunc("0 0 * * *", client.sendRepeatedMessages)
+	_, err := client.cronJob.AddFunc("0 0 * * *", client.executeRepeatedCommands)
 
 	if err != nil {
 		return err

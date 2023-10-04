@@ -5,7 +5,6 @@ import (
 
 	"github.com/SushiWaUmai/prince/db"
 	"github.com/SushiWaUmai/prince/env"
-	"github.com/SushiWaUmai/prince/utils"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
 	"go.mau.fi/whatsmeow/types"
 	"go.mau.fi/whatsmeow/types/events"
@@ -37,16 +36,19 @@ func (client *PrinceClient) handleMessageEvents(e *events.Message) {
 	}
 }
 
-func (client *PrinceClient) sendRepeatedMessage(msg db.RepeatedMessage) error {
+func (client *PrinceClient) executeRepeatedCommand(msg db.RepeatedCommand) error {
 	jid, err := types.ParseJID(msg.JID)
 	if err != nil {
-		log.Println("Failed to send message:", err)
+		log.Println("Failed to execute repeated command:", err)
 		return err
 	}
 
-	_, err = client.SendCommandMessage(jid, msg.User, utils.CreateTextMessage(msg.Message))
+	ctx := &waProto.ContextInfo{}
+
+	_, err = RunCommand(client.wac, msg.Content, ctx, jid, msg.User)
+
 	if err != nil {
-		log.Println("Failed to send message:", err)
+		log.Println("Failed to execute repeated command:", err)
 		return err
 	}
 
@@ -70,11 +72,11 @@ func (client *PrinceClient) sendRepeatedMessage(msg db.RepeatedMessage) error {
 	return nil
 }
 
-func (client *PrinceClient) sendRepeatedMessages() {
-	msgs := db.GetRepeatedMessageToday()
+func (client *PrinceClient) executeRepeatedCommands() {
+	msgs := db.GetRepeatedCommandsToday()
 
 	for _, msg := range msgs {
-		go client.sendRepeatedMessage(msg)
+		go client.executeRepeatedCommand(msg)
 	}
 
 	log.Println("Sent", len(msgs), "repeated messages")

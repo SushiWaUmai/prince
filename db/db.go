@@ -26,7 +26,7 @@ func init() {
 		log.Panicln("Failed to open database connection:", err)
 	}
 
-	err = db.AutoMigrate(&RepeatedMessage{})
+	err = db.AutoMigrate(&RepeatedCommand{})
 	if err != nil {
 		log.Panicln("Failed to migrate database:", err)
 	}

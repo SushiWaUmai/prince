@@ -14,7 +14,6 @@ import (
 	"github.com/SushiWaUmai/prince/utils"
 )
 
-// TODO: Convert repeated messages to repeated commands
 func RepeatCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 	// 1. arg: start date xx.xx.xxxx
 	// 2. arg: repeat "YEARLY","MONTHLY","WEEKLY","DAILY"
@@ -40,7 +39,7 @@ func RepeatCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *w
 	message := strings.Join(args[2:], " ")
 
 	// Save the message
-	_, err = db.CreateRepeatedMessage(chat.String(), user, message, repeat, date)
+	_, err = db.CreateRepeatedCommand(chat.String(), user, message, repeat, date)
 	if err != nil {
 		return nil, err
 	}

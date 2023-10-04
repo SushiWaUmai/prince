@@ -11,10 +11,9 @@ import (
 	"github.com/SushiWaUmai/prince/utils"
 )
 
-// TODO: Convert repeated messages to repeated commands
 func ClearRepeatCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 	// Delete the message
-	affected, err := db.ClearRepeatedMessage(chat.String(), user)
+	affected, err := db.ClearRepeatedCommands(chat.String(), user)
 	if err != nil {
 		return nil, err
 	}
