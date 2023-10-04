@@ -21,6 +21,9 @@ func LuaCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waPr
 	var script string
 	var luaArgs []string
 	if pipe == nil {
+		if len(args) <= 0 {
+			return utils.CreateTextMessage("Please input a lua script"), errors.New("No script specified")
+		}
 		script = args[0]
 		luaArgs = args[1:]
 	} else {
