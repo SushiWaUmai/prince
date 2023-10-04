@@ -362,4 +362,63 @@ func TestLexer(t *testing.T) {
 		tokens = lang.Lex(sampleTripeDoubleQuote)
 		assert.Equal(expected, tokens)
 	})
+
+	t.Run("Test with other types of not accepted quotation marks", func(t *testing.T) {
+		assert := assert.New(t)
+		sampleEnglish := string(env.BOT_PREFIX) + "echo “hello world”"
+		sampleGerman := string(env.BOT_PREFIX) + "echo „hello world“"
+
+		expectedEnglish := []lang.Token{
+			{
+				Type:  lang.SEPARATOR,
+				Lexme: string(env.BOT_PREFIX),
+			},
+			{
+				Type:  lang.IDENTIFIER,
+				Lexme: "echo",
+			},
+			{
+				Type:  lang.IDENTIFIER,
+				Lexme: "“hello",
+			},
+			{
+				Type:  lang.IDENTIFIER,
+				Lexme: "world”",
+			},
+			{
+				Type:  lang.EOF,
+				Lexme: "",
+			},
+		}
+
+		expectedGerman := []lang.Token{
+			{
+				Type:  lang.SEPARATOR,
+				Lexme: string(env.BOT_PREFIX),
+			},
+			{
+				Type:  lang.IDENTIFIER,
+				Lexme: "echo",
+			},
+			{
+				Type:  lang.IDENTIFIER,
+				Lexme: "„hello",
+			},
+			{
+				Type:  lang.IDENTIFIER,
+				Lexme: "world“",
+			},
+			{
+				Type:  lang.EOF,
+				Lexme: "",
+			},
+		}
+
+		var tokens []lang.Token
+		tokens = lang.Lex(sampleEnglish)
+		assert.Equal(expectedEnglish, tokens)
+
+		tokens = lang.Lex(sampleGerman)
+		assert.Equal(expectedGerman, tokens)
+	})
 }
