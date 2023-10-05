@@ -16,7 +16,7 @@ func HelpCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waP
 	if len(args) > 0 {
 		cmd, ok := utils.CommandMap[args[0]]
 		if !ok {
-			return utils.CreateTextMessage("Command \"" + args[0] + "\"not found"), nil
+			return utils.CreateTextMessage("Command \"" + args[0] + "\" not found"), nil
 		}
 
 		var data []string
