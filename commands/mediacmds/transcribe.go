@@ -11,7 +11,7 @@ import (
 
 func TranscribeCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 	// Check if there's a voice message quoted
-	if pipe.AudioMessage == nil {
+	if pipe == nil || pipe.AudioMessage == nil {
 		return utils.CreateTextMessage("Please reply to a voice message"), errors.New("No voice message quoted")
 	}
 
