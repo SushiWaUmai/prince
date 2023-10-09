@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"net/url"
@@ -59,6 +60,10 @@ func Txt2Img(prompt string) ([]byte, error) {
 	err = json.Unmarshal(body, &res)
 	if err != nil {
 		return nil, err
+	}
+
+	if len(res.Images) <= 0 {
+		return nil, errors.New("Could not generate any images")
 	}
 
 	imgData, err := base64.StdEncoding.DecodeString(res.Images[0])
