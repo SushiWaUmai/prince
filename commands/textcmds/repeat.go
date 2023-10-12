@@ -23,9 +23,15 @@ func RepeatCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *w
 	}
 
 	// Get the date
-	date, err := time.Parse("02.01.2006", args[0])
-	if err != nil {
-		return utils.CreateTextMessage("Error parsing date. Please use format dd.mm.yyyy"), err
+	var date time.Time
+	var err error
+	if strings.ToUpper(args[0]) == "TODAY" {
+		date = time.Now()
+	} else { 
+		date, err = time.Parse("02.01.2006", args[0])
+		if err != nil {
+			return utils.CreateTextMessage("Error parsing date. Please use format dd.mm.yyyy"), err
+		}
 	}
 
 	// Get the repeat
@@ -34,16 +40,16 @@ func RepeatCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *w
 		return utils.CreateTextMessage("Error parsing repeat. Please use one of 'YEARLY', 'MONTHLY', 'WEEKLY' or 'DAILY'"), errors.New("Could not parse repeat argument")
 	}
 
-	// Get the message
-	message := strings.Join(args[2:], " ")
+	// Get the command 
+	command := strings.Join(args[2:], " ")
 
-	// Save the message
-	_, err = db.CreateRepeatedCommand(chat.String(), user, message, repeat, date)
+	// Save the command
+	_, err = db.CreateRepeatedCommand(chat.String(), user, command, repeat, date)
 	if err != nil {
 		return nil, err
 	}
 
-	return utils.CreateTextMessage(fmt.Sprintf("Saved! Sending first message at %s", date.Format("02.01.2006"))), nil
+	return utils.CreateTextMessage(fmt.Sprintf("Saved! Executing first command at %s", date.Format("02.01.2006"))), nil
 }
 
 func init() {
