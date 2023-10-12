@@ -15,7 +15,12 @@ func EchoCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waP
 	if len(args) > 0 {
 		text := strings.Join(args, " ")
 		text = strings.TrimSpace(text)
-		return utils.CreateTextMessage(text), nil
+		_, err := client.SendMessage(context.Background(), chat, utils.CreateTextMessage(text))
+		if err != nil {
+			return nil, err
+		}
+
+		return pipe, nil
 	}
 
 	if pipe == nil {
