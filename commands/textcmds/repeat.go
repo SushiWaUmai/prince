@@ -17,10 +17,9 @@ import (
 func RepeatCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *waProto.ContextInfo, pipe *waProto.Message, args []string) (*waProto.Message, error) {
 	// 1. arg: start date xx.xx.xxxx
 	// 2. arg: repeat "YEARLY","MONTHLY","WEEKLY","DAILY"
-	// 3-n. arg: message
-	// TODO: use pipe
+	// 3-n. arg: command
 	if len(args) < 3 {
-		return utils.CreateTextMessage("Usage: repeat <start date> <repeat> <message>"), errors.New("Not enough arguments")
+		return utils.CreateTextMessage("Usage: repeat <start date> <repeat> <command>"), errors.New("Not enough arguments")
 	}
 
 	// Get the date
@@ -32,7 +31,7 @@ func RepeatCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *w
 	// Get the repeat
 	repeat := strings.ToUpper(args[1])
 	if (repeat != "YEARLY") && (repeat != "MONTHLY") && (repeat != "WEEKLY") && (repeat != "DAILY") {
-		return utils.CreateTextMessage("Error parsing repeat. Please use one of 'YEARLY', 'MONTHLY', 'WEEKLY' or 'DAILY'"), errors.New("Could not parse repeat")
+		return utils.CreateTextMessage("Error parsing repeat. Please use one of 'YEARLY', 'MONTHLY', 'WEEKLY' or 'DAILY'"), errors.New("Could not parse repeat argument")
 	}
 
 	// Get the message
