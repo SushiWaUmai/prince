@@ -45,7 +45,7 @@ func (client *PrinceClient) executeRepeatedCommand(msg db.RepeatedCommand) error
 
 	ctx := &waProto.ContextInfo{}
 
-	_, err = RunCommand(client.wac, msg.Content, ctx, jid, msg.User)
+	_, err = RunCommand(client.wac, string(client.commandPrefix) + msg.Content, ctx, jid, msg.User)
 
 	if err != nil {
 		log.Println("Failed to execute repeated command:", err)
