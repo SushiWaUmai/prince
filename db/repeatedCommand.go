@@ -33,6 +33,13 @@ func ClearRepeatedCommands(jid string, user string) (int64, error) {
 	return result.RowsAffected, result.Error
 }
 
+func GetRepeatedCommands(jid string, user string) []RepeatedCommand {
+	var messages []RepeatedCommand
+	db.Where("jid = ? AND user = ?", jid, user).Find(&messages)
+
+	return messages
+}
+
 func UpdateNextDate(id uint, nextDate time.Time) error {
 	return db.Model(&RepeatedCommand{}).Where("id = ?", id).Update("next_date", nextDate).Error
 }

@@ -18,6 +18,19 @@ func RepeatCommand(client *whatsmeow.Client, chat types.JID, user string, ctx *w
 	// 1. arg: start date xx.xx.xxxx
 	// 2. arg: repeat "YEARLY","MONTHLY","WEEKLY","DAILY"
 	// 3-n. arg: command
+	if len(args) == 0 {
+		commands := db.GetRepeatedCommands(chat.String(), user)
+		if len(commands) <= 0 {
+			return utils.CreateTextMessage("No Repeated Commands found"), nil
+		}
+
+		text := "Repeated Commands:\n"
+		for _, cmd := range commands {
+			text += fmt.Sprintf("*%s*\n, %s\n\n", cmd.Content, cmd.Repeat)
+		}
+
+		return utils.CreateTextMessage(text), nil
+	}
 	if len(args) < 3 {
 		return utils.CreateTextMessage("Usage: repeat <start date> <repeat> <command>"), errors.New("Not enough arguments")
 	}

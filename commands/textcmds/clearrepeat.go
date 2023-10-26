@@ -22,5 +22,5 @@ func ClearRepeatCommand(client *whatsmeow.Client, chat types.JID, user string, c
 }
 
 func init() {
-	utils.CreateCommand("clearrepeat", "ADMIN", "Clears a repeated command", ClearRepeatCommand)
+	utils.CreateCommand("clearrepeat", "ADMIN", "Clears all repeated commands in this chat", ClearRepeatCommand)
 }
