@@ -8,7 +8,7 @@ import (
 
 	"go.mau.fi/whatsmeow/store/sqlstore"
 
-	// "github.com/SushiWaUmai/prince/api"
+	"github.com/SushiWaUmai/prince/api"
 	"github.com/SushiWaUmai/prince/client"
 	_ "github.com/SushiWaUmai/prince/commands"
 	"github.com/SushiWaUmai/prince/env"
@@ -17,7 +17,7 @@ import (
 )
 
 func main() {
-	// api.CreateAPI()
+	api.CreateAPI()
 
 	dbLog := waLog.Stdout("Database", "DEBUG", true)
 	// Make sure you add appropriate DB connector imports, e.g. github.com/mattn/go-sqlite3 for SQLite
